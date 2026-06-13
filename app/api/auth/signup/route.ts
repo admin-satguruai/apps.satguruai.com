@@ -5,7 +5,7 @@ const ALLOWED_DOMAIN = 'satgurutravel.com';
 const TOKEN_TTL_MS = 10 * 60 * 1000;
 
 function sign(value: string) {
-  const secret = process.env.AUTH_SECRET || process.env.EMAIL_PROVIDER_API_KEY || 'development-secret-change-before-production';
+  const secret = process.env.AUTH_SECRET || process.env.EMAIL_PROVIDER_API_KEY || process.env.RESEND_API_KEY || 'development-secret-change-before-production';
   return createHmac('sha256', secret).update(value).digest('hex');
 }
 
@@ -16,11 +16,15 @@ function createVerificationToken(email: string, otp: string) {
 }
 
 async function sendOtpEmail(email: string, otp: string) {
-  const apiKey = process.env.EMAIL_PROVIDER_API_KEY;
-  const from = process.env.EMAIL_FROM_ADDRESS;
+  const apiKey = process.env.EMAIL_PROVIDER_API_KEY || process.env.RESEND_API_KEY;
+  const from = process.env.EMAIL_FROM_ADDRESS || process.env.RESEND_FROM_EMAIL;
 
-  if (!apiKey || !from) {
-    throw new Error('Email provider is not configured. Add EMAIL_PROVIDER_API_KEY and EMAIL_FROM_ADDRESS in Vercel.');
+  if (!apiKey) {
+    throw new Error('OTP email is not configured. Add EMAIL_PROVIDER_API_KEY or RESEND_API_KEY in Vercel Environment Variables.');
+  }
+
+  if (!from) {
+    throw new Error('OTP sender email is not configured. Add EMAIL_FROM_ADDRESS or RESEND_FROM_EMAIL in Vercel Environment Variables.');
   }
 
   const response = await fetch('https://api.resend.com/emails', {
@@ -31,15 +35,15 @@ async function sendOtpEmail(email: string, otp: string) {
     },
     body: JSON.stringify({
       from,
-      to: email,
+      to: [email],
       subject: 'Satguru AI Central Portal OTP',
-      html: `<p>Your Satguru AI Central Portal verification OTP is:</p><h2>${otp}</h2><p>This OTP will expire in 10 minutes.</p>`
+      text: `Your Satguru AI Central Portal verification OTP is ${otp}. This OTP will expire in 10 minutes.`
     })
   });
 
   if (!response.ok) {
     const detail = await response.text();
-    throw new Error(`Email provider failed: ${detail}`);
+    throw new Error(`OTP email could not be sent. Provider response: ${detail}`);
   }
 }
 
