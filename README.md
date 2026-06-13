@@ -88,6 +88,7 @@ Run `database/schema.sql` in PostgreSQL/Supabase, then `database/seed.sql` to cr
 - `/admin/documents`
 - `/admin/announcements`
 - `/admin/support`
+- `/admin/audit-logs`
 - `/admin/settings`
 
 ## Architecture notes

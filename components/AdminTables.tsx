@@ -1,4 +1,4 @@
-import { allowedDomains, categories, portals, supportTickets, users } from '@/lib/data';
+import { allowedDomains, auditLogs, categories, portals, supportTickets, users } from '@/lib/data';
 import { StatusBadge } from './PortalCard';
 
 type RowValue = string | number;
@@ -76,6 +76,10 @@ export function DocumentTable() {
 
 export function SupportTable() {
   return <Table heads={['Ticket', 'Requester', 'Category', 'Subject', 'Status']} rows={supportTickets.map((ticket) => [ticket.ticketNumber, ticket.requester, ticket.category, ticket.subject, ticket.status])} />;
+}
+
+export function AuditLogTable() {
+  return <Table heads={['Activity', 'Performed by', 'Affected record', 'Created at']} rows={auditLogs.map((log) => [log.activityType, log.performedBy, log.affectedRecord, log.createdAt])} />;
 }
 
 function Table({ heads, rows }: { heads: string[]; rows: RowValue[][] }) {

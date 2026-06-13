@@ -44,6 +44,13 @@ export const supportTickets: SupportTicket[] = [
   { id:'tick-1', ticketNumber:'SAT-1001', category:'access request', subject:'Need COPS access', status:'submitted', priority:'medium', portal:'COPS', requester:'Grace Mensah', createdAt:'2026-06-10' },
   { id:'tick-2', ticketNumber:'SAT-1002', category:'documentation issue', subject:'Retail CRM SOP update', status:'in_review', priority:'low', portal:'Retail CRM', requester:'Rahul Mehta', createdAt:'2026-06-11' }
 ];
+
+export const auditLogs = [
+  { id: 'audit-1', activityType: 'portal.created', performedBy: 'Anita Sharma', affectedRecord: 'Retail CRM', createdAt: '2026-06-10 09:00 UTC' },
+  { id: 'audit-2', activityType: 'domain.approved', performedBy: 'Anita Sharma', affectedRecord: 'satgurutravel.com', createdAt: '2026-06-10 09:15 UTC' },
+  { id: 'audit-3', activityType: 'support.updated', performedBy: 'Rahul Mehta', affectedRecord: 'SAT-1002', createdAt: '2026-06-11 14:30 UTC' }
+];
+
 export const categories = Array.from(new Set(portals.map(p => p.category))).map((category, i) => ({ id:`cat-${i+1}`, name:category, description:`${category} portals and tools`, status:'active' }));
 export const announcements = [
   { title:'MVP launch foundation', message:'The central portal now provides a governed directory, support flow, and admin-ready management screens.', priority:'high' },
