@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function Login(){return <section className="mx-auto max-w-md px-4 py-16"><form className="card grid gap-4"><h1 className="text-3xl font-black text-navy">Login</h1><input className="input" type="email" placeholder="Official email"/><input className="input" type="password" placeholder="Password or OTP code"/><button className="btn-primary">Continue</button><div className="flex justify-between text-sm"><Link href="/signup">Create account</Link><Link href="/forgot-password">Forgot password?</Link></div></form></section>}

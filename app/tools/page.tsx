@@ -1,0 +1,2 @@
+import { PortalCard } from '@/components/PortalCard'; import { portals } from '@/lib/data';
+export default function Tools(){return <section className="mx-auto max-w-7xl px-4 py-16"><h1 className="text-4xl font-black text-navy">Tools preview</h1><p className="mt-4 max-w-3xl text-slate-600">Public visitors can view a limited overview. Login is required for internal links, support contacts, documentation, and detailed portal records.</p><div className="mt-8 grid gap-6 md:grid-cols-3">{portals.map(p=><PortalCard key={p.id} portal={p} publicPreview />)}</div></section>}
