@@ -1,51 +1,35 @@
 import Link from 'next/link';
 
-import { PortalCard } from '@/components/PortalCard';
-import { portals } from '@/lib/data';
-
 export default function Home() {
   return (
-    <div>
-      <section className="bg-gradient-to-br from-navy to-slate-800 text-white">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-20 md:grid-cols-2 md:items-center">
-          <div>
-            <p className="font-semibold text-saffron">app.satguruai.com</p>
-            <h1 className="mt-4 text-4xl font-black md:text-6xl">
-              One governed gateway for every Satguru AI application.
-            </h1>
-            <p className="mt-6 text-lg text-slate-200">
-              Discover tools, understand ownership, request support, and prepare for future SSO through a
-              database-backed portal registry.
-            </p>
-            <div className="mt-8 flex gap-3">
-              <Link className="btn-primary bg-saffron text-navy hover:bg-amber-400" href="/signup">
-                Request access
-              </Link>
-              <Link className="btn-secondary border-white/30 bg-white/10 text-white hover:bg-white/20" href="/tools">
-                Preview tools
-              </Link>
-            </div>
-          </div>
-          <div className="card bg-white/10 text-white">
-            <h2 className="text-2xl font-bold">MVP foundation</h2>
-            <ul className="mt-4 space-y-3 text-slate-100">
-              <li>✓ Approved-domain registration</li>
-              <li>✓ Admin-managed portal registry</li>
-              <li>✓ Portal documentation metadata</li>
-              <li>✓ Support request intake</li>
-            </ul>
-          </div>
-        </div>
-      </section>
+    <section className="mx-auto flex min-h-[calc(100vh-145px)] max-w-5xl items-center px-4 py-16">
+      <div className="mx-auto max-w-3xl text-center">
+        <p className="font-semibold text-saffron">app.satguruai.com</p>
+        <h1 className="mt-4 text-4xl font-black text-navy md:text-6xl">
+          Satguru AI Central Portal
+        </h1>
+        <p className="mt-6 text-lg text-slate-600">
+          Secure employee entry point for Satguru internal applications. Portal tools, documentation,
+          support details, dashboard and admin areas are visible only after login.
+        </p>
 
-      <section className="mx-auto max-w-7xl px-4 py-16">
-        <h2 className="text-3xl font-bold text-navy">Featured tools preview</h2>
-        <div className="mt-8 grid gap-6 md:grid-cols-3">
-          {portals.slice(0, 3).map((portal) => (
-            <PortalCard key={portal.id} portal={portal} publicPreview />
-          ))}
+        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+          <Link className="btn-primary" href="/login">
+            Login
+          </Link>
+          <Link className="btn-secondary" href="/signup">
+            Self signup with @satgurutravel.com
+          </Link>
         </div>
-      </section>
-    </div>
+
+        <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 text-left text-sm text-slate-600 shadow-sm">
+          <p className="font-semibold text-navy">Access policy</p>
+          <p className="mt-2">
+            Only users with an official <strong>@satgurutravel.com</strong> email ID can self-signup.
+            Email OTP verification is required before the user can enter the portal.
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }
