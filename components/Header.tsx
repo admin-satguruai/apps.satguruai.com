@@ -8,16 +8,14 @@ export function Header() {
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-navy text-saffron">SA</span>
           <span>Satguru AI</span>
         </Link>
-        <nav className="hidden gap-6 text-sm font-medium md:flex">
-          <Link href="/about">About</Link>
-          <Link href="/tools">Tools</Link>
-          <Link href="/contact">Contact</Link>
-          <Link href="/dashboard">Dashboard</Link>
-          <Link href="/admin">Admin</Link>
-        </nav>
+
         <div className="flex gap-2">
-          <Link href="/login" className="btn-secondary py-2">Login</Link>
-          <Link href="/signup" className="btn-primary py-2">Sign up</Link>
+          <Link href="/login" className="btn-secondary py-2">
+            Login
+          </Link>
+          <Link href="/signup" className="btn-primary py-2">
+            Self signup
+          </Link>
         </div>
       </div>
     </header>
