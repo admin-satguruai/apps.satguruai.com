@@ -1,1 +1,32 @@
-export default function About(){return <section className="mx-auto max-w-5xl px-4 py-16"><h1 className="text-4xl font-black text-navy">About Satguru AI Central Portal</h1><p className="mt-6 text-lg text-slate-700">Satguru AI Central Portal is the official internal application hub for Satguru Travel Group AI-supported systems, CRM tools, operations portals, sales intelligence, process repositories, and department productivity applications.</p><div className="mt-10 grid gap-6 md:grid-cols-3"><div className="card"><h2 className="font-bold text-navy">Governance</h2><p className="mt-2 text-sm text-slate-600">Every portal has an owner, category, status, support contact, and lifecycle record.</p></div><div className="card"><h2 className="font-bold text-navy">Discovery</h2><p className="mt-2 text-sm text-slate-600">Employees can find the right tool by department, keyword, category, or documentation.</p></div><div className="card"><h2 className="font-bold text-navy">Future ready</h2><p className="mt-2 text-sm text-slate-600">The MVP keeps clean hooks for AI assistance, analytics, access requests, and SSO.</p></div></div></section>}
+export default function About() {
+  return (
+    <section className="mx-auto max-w-5xl px-4 py-16">
+      <h1 className="text-4xl font-black text-navy">About Satguru AI Central Portal</h1>
+      <p className="mt-6 text-lg text-slate-700">
+        Satguru AI Central Portal is the official internal application hub for Satguru Travel Group AI-supported
+        systems, CRM tools, operations portals, sales intelligence, process repositories, and department productivity
+        applications.
+      </p>
+      <div className="mt-10 grid gap-6 md:grid-cols-3">
+        <div className="card">
+          <h2 className="font-bold text-navy">Governance</h2>
+          <p className="mt-2 text-sm text-slate-600">
+            Every portal has an owner, category, status, support contact, and lifecycle record.
+          </p>
+        </div>
+        <div className="card">
+          <h2 className="font-bold text-navy">Discovery</h2>
+          <p className="mt-2 text-sm text-slate-600">
+            Employees can find the right tool by department, keyword, category, or documentation.
+          </p>
+        </div>
+        <div className="card">
+          <h2 className="font-bold text-navy">Future ready</h2>
+          <p className="mt-2 text-sm text-slate-600">
+            The MVP keeps clean hooks for AI assistance, analytics, access requests, and SSO.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}

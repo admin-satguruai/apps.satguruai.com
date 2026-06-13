@@ -1,2 +1,28 @@
 import { allowedDomains } from '@/lib/data';
-export default function Signup(){return <section className="mx-auto max-w-3xl px-4 py-16"><form className="card grid gap-4"><h1 className="text-3xl font-black text-navy">Sign up with approved company email</h1><p className="text-sm text-slate-600">Approved domains: {allowedDomains.filter(d=>d.status==='active').map(d=>d.domain).join(', ')}. Accounts remain OTP-ready for secure email verification.</p><div className="grid gap-4 md:grid-cols-2"><input className="input" placeholder="Full name"/><input className="input" type="email" placeholder="Official email"/><input className="input" placeholder="Mobile"/><input className="input" placeholder="Department"/><input className="input" placeholder="Branch"/><input className="input" placeholder="Country"/></div><button className="btn-primary">Create pending account</button></form></section>}
+
+export default function Signup() {
+  const activeDomains = allowedDomains
+    .filter((domain) => domain.status === 'active')
+    .map((domain) => domain.domain)
+    .join(', ');
+
+  return (
+    <section className="mx-auto max-w-3xl px-4 py-16">
+      <form className="card grid gap-4">
+        <h1 className="text-3xl font-black text-navy">Sign up with approved company email</h1>
+        <p className="text-sm text-slate-600">
+          Approved domains: {activeDomains}. Accounts remain OTP-ready for secure email verification.
+        </p>
+        <div className="grid gap-4 md:grid-cols-2">
+          <input className="input" placeholder="Full name" />
+          <input className="input" type="email" placeholder="Official email" />
+          <input className="input" placeholder="Mobile" />
+          <input className="input" placeholder="Department" />
+          <input className="input" placeholder="Branch" />
+          <input className="input" placeholder="Country" />
+        </div>
+        <button className="btn-primary">Create pending account</button>
+      </form>
+    </section>
+  );
+}
