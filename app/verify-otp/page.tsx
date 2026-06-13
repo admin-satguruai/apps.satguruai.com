@@ -1,14 +1,18 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { FormEvent, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Verify() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const emailFromQuery = searchParams.get('email') ?? '';
+  const [emailFromQuery, setEmailFromQuery] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setEmailFromQuery(params.get('email') ?? '');
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -52,7 +56,7 @@ export default function Verify() {
         <p className="text-sm text-slate-600">
           Enter the OTP sent to your official @satgurutravel.com email ID.
         </p>
-        <input className="input" name="email" type="email" defaultValue={emailFromQuery} placeholder="Official email" required />
+        <input className="input" name="email" type="email" value={emailFromQuery} onChange={(event) => setEmailFromQuery(event.target.value)} placeholder="Official email" required />
         <input className="input" name="otp" inputMode="numeric" maxLength={6} placeholder="6-digit OTP" required />
         {message ? <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-700">{message}</p> : null}
         <button className="btn-primary" disabled={isSubmitting} type="submit">
