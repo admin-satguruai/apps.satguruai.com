@@ -1,6 +1,15 @@
 import { NextResponse } from 'next/server';
+import { upsertPortalUser } from '@/lib/supabase-admin';
 
 const allowedDomains = ['satgurutravel.com', 'satguruai.com'];
+
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: 'lax' as const,
+  secure: process.env.NODE_ENV === 'production',
+  maxAge: 24 * 60 * 60,
+  path: '/'
+};
 
 type GoogleUserInfo = {
   email?: string;
@@ -15,6 +24,10 @@ function getBaseUrl(request: Request) {
 
 function isAllowedEmail(email: string) {
   return allowedDomains.some((domain) => email.toLowerCase().endsWith(`@${domain}`));
+}
+
+function safeCookieValue(value: string) {
+  return encodeURIComponent(value).slice(0, 3500);
 }
 
 export async function GET(request: Request) {
@@ -69,6 +82,9 @@ export async function GET(request: Request) {
 
     const userInfo = (await userResponse.json()) as GoogleUserInfo;
     const email = String(userInfo.email || '').toLowerCase();
+    const name = String(userInfo.name || email.split('@')[0] || 'Satguru User');
+    const picture = String(userInfo.picture || '');
+    const lastLogin = new Date().toISOString();
 
     if (!email || !userInfo.email_verified) {
       return NextResponse.redirect(new URL('/login?error=Google email is not verified.', baseUrl));
@@ -78,28 +94,24 @@ export async function GET(request: Request) {
       return NextResponse.redirect(new URL('/login?error=This Google email domain is not allowed.', baseUrl));
     }
 
+    await upsertPortalUser({
+      email,
+      name,
+      picture,
+      role: 'user',
+      status: 'active',
+      login_method: 'google',
+      last_login: lastLogin
+    });
+
     const response = NextResponse.redirect(new URL('/dashboard', baseUrl));
-    response.cookies.set('satguru_session', 'google', {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 24 * 60 * 60,
-      path: '/'
-    });
-    response.cookies.set('satguru_role', 'user', {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 24 * 60 * 60,
-      path: '/'
-    });
-    response.cookies.set('satguru_user_email', email, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 24 * 60 * 60,
-      path: '/'
-    });
+    response.cookies.set('satguru_session', 'google', cookieOptions);
+    response.cookies.set('satguru_role', 'user', cookieOptions);
+    response.cookies.set('satguru_user_email', safeCookieValue(email), cookieOptions);
+    response.cookies.set('satguru_user_name', safeCookieValue(name), cookieOptions);
+    response.cookies.set('satguru_user_picture', safeCookieValue(picture), cookieOptions);
+    response.cookies.set('satguru_login_method', 'google', cookieOptions);
+    response.cookies.set('satguru_last_login', safeCookieValue(lastLogin), cookieOptions);
 
     return response;
   } catch {
