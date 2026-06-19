@@ -12,7 +12,7 @@ function isAllowedEmail(email: string) {
 
 function GoogleMark() {
   return (
-    <span className="relative inline-grid h-6 w-6 place-items-center rounded-full bg-white text-[17px] font-black shadow-sm">
+    <span className="inline-grid h-6 w-6 place-items-center rounded-full bg-white text-[18px] font-black shadow-sm">
       <span className="text-[#4285F4]">G</span>
     </span>
   );
@@ -55,56 +55,56 @@ export default function Login() {
       </div>
 
       <section className="relative mx-auto flex min-h-[calc(100vh-97px)] w-full max-w-7xl items-center justify-center">
-        <div className="grid w-full overflow-hidden rounded-[1.8rem] border border-white/80 bg-white/94 shadow-2xl shadow-slate-900/14 backdrop-blur-xl lg:h-[min(720px,calc(100vh-112px))] lg:grid-cols-[0.95fr_1.05fr]">
-          <aside className="hidden border-r border-slate-200/80 bg-white/45 p-8 lg:flex lg:flex-col lg:items-center lg:justify-center xl:p-10">
+        <div className="grid w-full overflow-hidden rounded-[1.8rem] border border-white/80 bg-white/94 shadow-2xl shadow-slate-900/14 backdrop-blur-xl lg:h-[min(660px,calc(100vh-104px))] lg:grid-cols-[0.92fr_1.08fr]">
+          <aside className="hidden border-r border-slate-200/80 bg-white/45 p-7 lg:flex lg:flex-col lg:items-center lg:justify-center xl:p-8">
             <div className="w-full max-w-lg text-center">
-              <div className="relative mx-auto mb-8 h-72 w-full">
-                <div className="absolute inset-0 rounded-full border border-emerald-200/70" />
-                <div className="absolute left-10 top-6 h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(16,185,129,0.75)]" />
+              <div className="relative mx-auto mb-5 h-60 w-full">
+                <div className="absolute inset-x-6 top-4 h-44 rounded-full border border-emerald-200/70" />
+                <div className="absolute left-12 top-6 h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(16,185,129,0.75)]" />
                 <div className="absolute right-16 top-24 h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(16,185,129,0.75)]" />
-                <div className="absolute bottom-8 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full border border-emerald-100" />
-                <div className="absolute inset-x-0 top-20 text-[clamp(3.2rem,6vw,5.3rem)] font-black tracking-tight leading-none">
+                <div className="absolute left-1/2 top-10 h-44 w-44 -translate-x-1/2 rounded-full border border-emerald-100" />
+                <div className="absolute inset-x-0 top-20 text-[clamp(3rem,5.4vw,4.9rem)] font-black leading-none tracking-tight">
                   <span className="text-emerald-700">Satguru</span><span className="text-orange-500">AI</span>
                 </div>
               </div>
-              <h1 className="text-3xl font-black text-slate-950 xl:text-4xl">Welcome back to Satguru AI</h1>
-              <p className="mt-3 text-base text-slate-600">Secure access to your internal AI applications and tools.</p>
+              <h1 className="text-[clamp(1.8rem,2.2vw,2.35rem)] font-black leading-tight text-slate-950">Welcome back to Satguru AI</h1>
+              <p className="mt-2 text-lg text-slate-600">Secure access to your internal AI applications and tools.</p>
             </div>
           </aside>
 
-          <div className="flex items-center justify-center p-4 sm:p-6 lg:p-8 xl:p-10">
-            <div className="w-full max-w-[580px]">
-              <div className="mb-4 text-center lg:hidden">
+          <div className="flex items-center justify-center p-4 sm:p-5 lg:p-7 xl:p-8">
+            <div className="w-full max-w-[610px]">
+              <div className="mb-3 text-center lg:hidden">
                 <div className="text-4xl font-black leading-none sm:text-5xl"><span className="text-emerald-700">Satguru</span><span className="text-orange-500">AI</span></div>
-                <p className="mt-2 text-sm text-slate-600">Welcome back! Sign in to access your Satguru AI home.</p>
+                <p className="mt-2 text-base text-slate-600">Welcome back! Sign in to access your Satguru AI home.</p>
               </div>
 
-              <button className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-4 py-3 text-base font-extrabold text-slate-900 shadow-sm hover:border-emerald-500 hover:bg-emerald-50" onClick={() => pending('Google login')} type="button">
+              <button className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-4 py-3 text-lg font-extrabold text-slate-900 shadow-sm hover:border-emerald-500 hover:bg-emerald-50" onClick={() => pending('Google login')} type="button">
                 <GoogleMark />
                 Continue with Google
               </button>
 
-              <div className="my-5 flex items-center gap-4 text-base text-slate-500 lg:my-6">
+              <div className="my-4 flex items-center gap-4 text-base text-slate-500 lg:my-5">
                 <span className="h-px flex-1 bg-slate-200" />
                 or
                 <span className="h-px flex-1 bg-slate-200" />
               </div>
 
-              <form className="grid gap-4" onSubmit={handleSubmit}>
-                <label className="grid gap-2 text-base font-extrabold text-slate-900">
+              <form className="grid gap-3" onSubmit={handleSubmit}>
+                <label className="grid gap-1.5 text-base font-extrabold text-slate-900">
                   Email ID
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl text-emerald-700">✉</span>
-                    <input className="w-full rounded-xl border border-slate-300 bg-white py-3.5 pl-12 pr-4 text-base font-semibold text-slate-900 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" name="email" type="email" placeholder="you@company.com" required />
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-emerald-700">✉</span>
+                    <input className="w-full rounded-xl border border-slate-300 bg-white py-3 pl-12 pr-4 text-lg font-semibold text-slate-900 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" name="email" type="email" placeholder="you@company.com" required />
                   </div>
                 </label>
 
-                <label className="grid gap-2 text-base font-extrabold text-slate-900">
+                <label className="grid gap-1.5 text-base font-extrabold text-slate-900">
                   Password
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl text-emerald-700">▣</span>
-                    <input className="w-full rounded-xl border border-slate-300 bg-white py-3.5 pl-12 pr-14 text-base font-semibold text-slate-900 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" name="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••••" required />
-                    <button className="absolute right-4 top-1/2 -translate-y-1/2 text-xl text-slate-600 hover:text-emerald-700" onClick={() => setShowPassword((value) => !value)} type="button">{showPassword ? '◌' : '◉'}</button>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-emerald-700">▣</span>
+                    <input className="w-full rounded-xl border border-slate-300 bg-white py-3 pl-12 pr-14 text-lg font-semibold text-slate-900 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" name="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••••" required />
+                    <button className="absolute right-4 top-1/2 -translate-y-1/2 text-2xl text-slate-600 hover:text-emerald-700" onClick={() => setShowPassword((value) => !value)} type="button">{showPassword ? '◌' : '◉'}</button>
                   </div>
                 </label>
 
@@ -118,10 +118,10 @@ export default function Login() {
 
                 {message ? <p className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-base text-amber-800">{message}</p> : null}
 
-                <button className="rounded-xl bg-emerald-700 px-5 py-3.5 text-xl font-black text-white shadow-lg shadow-emerald-700/20 hover:bg-emerald-800" type="submit">Login →</button>
+                <button className="rounded-xl bg-emerald-700 px-5 py-3 text-xl font-black text-white shadow-lg shadow-emerald-700/20 hover:bg-emerald-800" type="submit">Login →</button>
               </form>
 
-              <div className="my-5 flex items-center gap-3 text-base text-slate-700 lg:my-6">
+              <div className="my-4 flex items-center gap-3 text-base text-slate-700 lg:my-5">
                 <span className="h-px flex-1 bg-slate-200" />
                 <span className="whitespace-nowrap font-medium">New here? Create your access</span>
                 <span className="h-px flex-1 bg-slate-200" />
@@ -138,12 +138,10 @@ export default function Login() {
                 </button>
               </div>
 
-              <a className="mt-4 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-3 text-slate-900 hover:border-emerald-500 hover:bg-emerald-50" href="mailto:admin@satguruai.com?subject=Satguru AI Portal Login Help">
+              <a className="mt-4 flex items-center justify-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-3 text-center text-slate-900 hover:border-emerald-500 hover:bg-emerald-50" href="mailto:admin@satguruai.com?subject=Satguru AI Portal Login Help">
                 <span className="text-2xl text-emerald-700">☏</span>
                 <span><span className="block text-base font-black">Need help? Contact administrator</span><span className="text-sm text-slate-600">We are here to help you with access or any queries.</span></span>
               </a>
-
-              <p className="mt-4 text-center text-base text-slate-600">🛡 Allowed domains: satgurutravel.com and satguruai.com.</p>
             </div>
           </div>
         </div>
