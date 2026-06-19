@@ -1,8 +1,12 @@
 import { createHmac, randomInt } from 'crypto';
 import { NextResponse } from 'next/server';
 
-const ALLOWED_DOMAIN = 'satgurutravel.com';
+const ALLOWED_DOMAINS = ['satgurutravel.com', 'satguruai.com'];
 const TOKEN_TTL_MS = 10 * 60 * 1000;
+
+function isAllowedEmail(email: string) {
+  return ALLOWED_DOMAINS.some((domain) => email.endsWith(`@${domain}`));
+}
 
 function sign(value: string) {
   const secret = process.env.AUTH_SECRET || process.env.EMAIL_PROVIDER_API_KEY || process.env.RESEND_API_KEY || 'development-secret-change-before-production';
@@ -52,9 +56,9 @@ export async function POST(request: Request) {
     const body = await request.json();
     const email = String(body.email || '').trim().toLowerCase();
 
-    if (!email.endsWith(`@${ALLOWED_DOMAIN}`)) {
+    if (!isAllowedEmail(email)) {
       return NextResponse.json(
-        { message: 'Self signup is allowed only with an official @satgurutravel.com email ID.' },
+        { message: 'Self signup is allowed only with an approved official domain.' },
         { status: 400 }
       );
     }
