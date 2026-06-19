@@ -135,16 +135,10 @@ export default function Login() {
                 <span className="h-px flex-1 bg-slate-200" />
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <Link className="flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-base font-extrabold text-slate-900 shadow-sm hover:border-emerald-500 hover:bg-emerald-50" href="/signup">
-                  <span className="text-xl text-emerald-700">✉</span>
-                  Sign up with Email
-                </Link>
-                <button className="flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-base font-extrabold text-slate-900 shadow-sm hover:border-emerald-500 hover:bg-emerald-50" onClick={startGoogleLogin} type="button">
-                  <GoogleMark />
-                  Sign up with Google
-                </button>
-              </div>
+              <Link className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-base font-extrabold text-slate-900 shadow-sm hover:border-emerald-500 hover:bg-emerald-50" href="/signup">
+                <span className="text-xl text-emerald-700">✉</span>
+                Sign up with Email
+              </Link>
 
               <a className="mt-3 flex items-center justify-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-2.5 text-center text-slate-900 hover:border-emerald-500 hover:bg-emerald-50" href="mailto:admin@satguruai.com?subject=Satguru AI Portal Login Help">
                 <span className="text-2xl text-emerald-700">☏</span>
