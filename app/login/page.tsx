@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const allowedDomains = ['satgurutravel.com', 'satguruai.com'];
@@ -24,6 +24,14 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get('error');
+    if (error) {
+      setMessage(error);
+    }
+  }, []);
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage('');
@@ -40,8 +48,8 @@ export default function Login() {
     router.refresh();
   }
 
-  function pending(feature: string) {
-    setMessage(`${feature} will be connected in the next authentication phase.`);
+  function startGoogleLogin() {
+    window.location.href = '/api/auth/google';
   }
 
   return (
@@ -79,7 +87,7 @@ export default function Login() {
                 <p className="mt-1 text-sm text-slate-600">Welcome back! Sign in to access your Satguru AI home.</p>
               </div>
 
-              <button className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-base font-extrabold text-slate-900 shadow-sm hover:border-emerald-500 hover:bg-emerald-50" onClick={() => pending('Google login')} type="button">
+              <button className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-base font-extrabold text-slate-900 shadow-sm hover:border-emerald-500 hover:bg-emerald-50" onClick={startGoogleLogin} type="button">
                 <GoogleMark />
                 Continue with Google
               </button>
@@ -132,7 +140,7 @@ export default function Login() {
                   <span className="text-xl text-emerald-700">✉</span>
                   Sign up with Email
                 </Link>
-                <button className="flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-base font-extrabold text-slate-900 shadow-sm hover:border-emerald-500 hover:bg-emerald-50" onClick={() => pending('Google signup')} type="button">
+                <button className="flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-base font-extrabold text-slate-900 shadow-sm hover:border-emerald-500 hover:bg-emerald-50" onClick={startGoogleLogin} type="button">
                   <GoogleMark />
                   Sign up with Google
                 </button>
