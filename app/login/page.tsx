@@ -10,6 +10,14 @@ function isAllowedEmail(email: string) {
   return allowedDomains.some((domain) => email.endsWith(`@${domain}`));
 }
 
+function GoogleMark() {
+  return (
+    <span className="relative inline-grid h-6 w-6 place-items-center rounded-full bg-white text-[17px] font-black shadow-sm">
+      <span className="text-[#4285F4]">G</span>
+    </span>
+  );
+}
+
 export default function Login() {
   const router = useRouter();
   const [message, setMessage] = useState('');
@@ -56,7 +64,7 @@ export default function Login() {
                 <div className="absolute right-16 top-24 h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(16,185,129,0.75)]" />
                 <div className="absolute bottom-8 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full border border-emerald-100" />
                 <div className="absolute inset-x-0 top-20 text-[clamp(3.2rem,6vw,5.3rem)] font-black tracking-tight leading-none">
-                  <span className="text-emerald-700">Sat</span><span className="text-orange-500">guru</span><span className="text-orange-500">AI</span>
+                  <span className="text-emerald-700">Satguru</span><span className="text-orange-500">AI</span>
                 </div>
               </div>
               <h1 className="text-3xl font-black text-slate-950 xl:text-4xl">Welcome back to Satguru AI</h1>
@@ -65,77 +73,77 @@ export default function Login() {
           </aside>
 
           <div className="flex items-center justify-center p-4 sm:p-6 lg:p-8 xl:p-10">
-            <div className="w-full max-w-[560px]">
+            <div className="w-full max-w-[580px]">
               <div className="mb-4 text-center lg:hidden">
-                <div className="text-4xl font-black leading-none sm:text-5xl"><span className="text-emerald-700">Sat</span><span className="text-orange-500">guru</span><span className="text-orange-500">AI</span></div>
-                <p className="mt-2 text-xs text-slate-600 sm:text-sm">Welcome back! Sign in to access your Satguru AI home.</p>
+                <div className="text-4xl font-black leading-none sm:text-5xl"><span className="text-emerald-700">Satguru</span><span className="text-orange-500">AI</span></div>
+                <p className="mt-2 text-sm text-slate-600">Welcome back! Sign in to access your Satguru AI home.</p>
               </div>
 
-              <button className="flex w-full items-center justify-center gap-3 rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base font-bold text-slate-900 shadow-sm hover:border-emerald-500 hover:bg-emerald-50" onClick={() => pending('Google login')} type="button">
-                <span className="text-xl font-black text-blue-600">G</span>
+              <button className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-4 py-3 text-base font-extrabold text-slate-900 shadow-sm hover:border-emerald-500 hover:bg-emerald-50" onClick={() => pending('Google login')} type="button">
+                <GoogleMark />
                 Continue with Google
               </button>
 
-              <div className="my-5 flex items-center gap-4 text-sm text-slate-500 lg:my-6">
+              <div className="my-5 flex items-center gap-4 text-base text-slate-500 lg:my-6">
                 <span className="h-px flex-1 bg-slate-200" />
                 or
                 <span className="h-px flex-1 bg-slate-200" />
               </div>
 
               <form className="grid gap-4" onSubmit={handleSubmit}>
-                <label className="grid gap-2 text-sm font-bold text-slate-900">
+                <label className="grid gap-2 text-base font-extrabold text-slate-900">
                   Email ID
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-slate-500">✉</span>
-                    <input className="w-full rounded-xl border border-slate-300 bg-white py-3 pl-12 pr-4 text-base text-slate-900 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" name="email" type="email" placeholder="you@company.com" required />
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl text-emerald-700">✉</span>
+                    <input className="w-full rounded-xl border border-slate-300 bg-white py-3.5 pl-12 pr-4 text-base font-semibold text-slate-900 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" name="email" type="email" placeholder="you@company.com" required />
                   </div>
                 </label>
 
-                <label className="grid gap-2 text-sm font-bold text-slate-900">
+                <label className="grid gap-2 text-base font-extrabold text-slate-900">
                   Password
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-slate-500">▧</span>
-                    <input className="w-full rounded-xl border border-slate-300 bg-white py-3 pl-12 pr-14 text-base text-slate-900 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" name="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••••" required />
-                    <button className="absolute right-4 top-1/2 -translate-y-1/2 text-lg text-slate-500" onClick={() => setShowPassword((value) => !value)} type="button">◉</button>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl text-emerald-700">▣</span>
+                    <input className="w-full rounded-xl border border-slate-300 bg-white py-3.5 pl-12 pr-14 text-base font-semibold text-slate-900 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" name="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••••" required />
+                    <button className="absolute right-4 top-1/2 -translate-y-1/2 text-xl text-slate-600 hover:text-emerald-700" onClick={() => setShowPassword((value) => !value)} type="button">{showPassword ? '◌' : '◉'}</button>
                   </div>
                 </label>
 
-                <div className="flex items-center justify-between gap-3 text-sm">
+                <div className="flex items-center justify-between gap-3 text-base">
                   <label className="flex items-center gap-2 text-slate-700">
                     <input className="h-4 w-4 rounded border-slate-300 text-emerald-700" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} type="checkbox" />
                     Remember me
                   </label>
-                  <Link className="font-bold text-emerald-700 hover:underline" href="/forgot-password">Forgot password?</Link>
+                  <Link className="font-extrabold text-emerald-700 hover:underline" href="/forgot-password">Forgot password?</Link>
                 </div>
 
-                {message ? <p className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">{message}</p> : null}
+                {message ? <p className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-base text-amber-800">{message}</p> : null}
 
-                <button className="rounded-xl bg-emerald-700 px-5 py-3.5 text-lg font-black text-white shadow-lg shadow-emerald-700/20 hover:bg-emerald-800" type="submit">Login →</button>
+                <button className="rounded-xl bg-emerald-700 px-5 py-3.5 text-xl font-black text-white shadow-lg shadow-emerald-700/20 hover:bg-emerald-800" type="submit">Login →</button>
               </form>
 
-              <div className="my-5 flex items-center gap-3 text-sm text-slate-700 lg:my-6">
+              <div className="my-5 flex items-center gap-3 text-base text-slate-700 lg:my-6">
                 <span className="h-px flex-1 bg-slate-200" />
-                <span className="whitespace-nowrap">New here? Create your access</span>
+                <span className="whitespace-nowrap font-medium">New here? Create your access</span>
                 <span className="h-px flex-1 bg-slate-200" />
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
-                <Link className="flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-900 shadow-sm hover:border-emerald-500 hover:bg-emerald-50" href="/signup">
-                  <span className="text-lg text-emerald-700">✉</span>
+                <Link className="flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 text-base font-extrabold text-slate-900 shadow-sm hover:border-emerald-500 hover:bg-emerald-50" href="/signup">
+                  <span className="text-xl text-emerald-700">✉</span>
                   Sign up with Email
                 </Link>
-                <button className="flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-900 shadow-sm hover:border-emerald-500 hover:bg-emerald-50" onClick={() => pending('Google signup')} type="button">
-                  <span className="text-lg font-black text-blue-600">G</span>
+                <button className="flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 text-base font-extrabold text-slate-900 shadow-sm hover:border-emerald-500 hover:bg-emerald-50" onClick={() => pending('Google signup')} type="button">
+                  <GoogleMark />
                   Sign up with Google
                 </button>
               </div>
 
               <a className="mt-4 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-3 text-slate-900 hover:border-emerald-500 hover:bg-emerald-50" href="mailto:admin@satguruai.com?subject=Satguru AI Portal Login Help">
                 <span className="text-2xl text-emerald-700">☏</span>
-                <span><span className="block text-sm font-black">Need help? Contact administrator</span><span className="text-xs text-slate-600">We are here to help you with access or any queries.</span></span>
+                <span><span className="block text-base font-black">Need help? Contact administrator</span><span className="text-sm text-slate-600">We are here to help you with access or any queries.</span></span>
               </a>
 
-              <p className="mt-4 text-center text-sm text-slate-600">🛡 Allowed domains: satgurutravel.com and satguruai.com.</p>
+              <p className="mt-4 text-center text-base text-slate-600">🛡 Allowed domains: satgurutravel.com and satguruai.com.</p>
             </div>
           </div>
         </div>
