@@ -3,7 +3,11 @@
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-const allowedDomain = 'satgurutravel.com';
+const allowedDomains = ['satgurutravel.com', 'satguruai.com'];
+
+function isAllowedEmail(email: string) {
+  return allowedDomains.some((domain) => email.endsWith(`@${domain}`));
+}
 
 export default function Signup() {
   const router = useRouter();
@@ -18,8 +22,8 @@ export default function Signup() {
     const form = new FormData(event.currentTarget);
     const email = String(form.get('email') ?? '').trim().toLowerCase();
 
-    if (!email.endsWith(`@${allowedDomain}`)) {
-      setMessage('Self signup is allowed only with an official @satgurutravel.com email ID.');
+    if (!isAllowedEmail(email)) {
+      setMessage('Self signup is allowed only with an approved official domain.');
       setIsSubmitting(false);
       return;
     }
@@ -68,12 +72,12 @@ export default function Signup() {
       <form className="card grid gap-4" onSubmit={handleSubmit}>
         <h1 className="text-3xl font-black text-navy">Self signup</h1>
         <p className="text-sm text-slate-600">
-          Signup is restricted to official <strong>@satgurutravel.com</strong> email IDs. After submitting,
-          the system will send an OTP to your email.
+          Signup is restricted to approved official domains: <strong>satgurutravel.com</strong> and <strong>satguruai.com</strong>.
+          After submitting, the system will send an OTP to your email.
         </p>
         <div className="grid gap-4 md:grid-cols-2">
           <input className="input" name="fullName" placeholder="Full name" required />
-          <input className="input" name="email" type="email" placeholder="Official @satgurutravel.com email" required />
+          <input className="input" name="email" type="email" placeholder="Official company email" required />
           <input className="input" name="mobile" placeholder="Mobile" />
           <input className="input" name="department" placeholder="Department" />
           <input className="input" name="branch" placeholder="Branch" />
