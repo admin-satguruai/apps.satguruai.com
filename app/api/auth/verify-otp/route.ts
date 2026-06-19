@@ -1,6 +1,12 @@
 import { createHmac, timingSafeEqual } from 'crypto';
 import { NextResponse } from 'next/server';
 
+const ALLOWED_DOMAINS = ['satgurutravel.com', 'satguruai.com'];
+
+function isAllowedEmail(email: string) {
+  return ALLOWED_DOMAINS.some((domain) => email.endsWith(`@${domain}`));
+}
+
 function sign(value: string) {
   const secret = process.env.AUTH_SECRET || process.env.EMAIL_PROVIDER_API_KEY || 'development-secret-change-before-production';
   return createHmac('sha256', secret).update(value).digest('hex');
@@ -20,8 +26,8 @@ export async function POST(request: Request) {
     const verificationToken = String(body.verificationToken || '');
     const [tokenEmail, expiresAtText, tokenSignature] = verificationToken.split('.');
 
-    if (!email.endsWith('@satgurutravel.com')) {
-      return NextResponse.json({ message: 'Verification is allowed only with an official @satgurutravel.com email ID.' }, { status: 400 });
+    if (!isAllowedEmail(email)) {
+      return NextResponse.json({ message: 'Verification is allowed only with an approved official domain.' }, { status: 400 });
     }
 
     if (!tokenEmail || !expiresAtText || !tokenSignature || tokenEmail !== email) {
