@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -25,22 +24,24 @@ export default function Login() {
   }
 
   return (
-    <section className="mx-auto max-w-md px-4 py-16">
-      <form className="card grid gap-4" onSubmit={handleSubmit}>
-        <h1 className="text-3xl font-black text-navy">Login</h1>
-        <p className="text-sm text-slate-600">
-          Use your official company email ID to enter the portal.
-        </p>
+    <section className="mx-auto flex min-h-[calc(100vh-145px)] max-w-md items-center px-4 py-16">
+      <form className="card grid w-full gap-4" onSubmit={handleSubmit}>
+        <div>
+          <p className="font-semibold text-saffron">app.satguruai.com</p>
+          <h1 className="mt-2 text-3xl font-black text-navy">Login</h1>
+          <p className="mt-2 text-sm text-slate-600">
+            Enter your official company email ID and password to access the internal portal.
+          </p>
+        </div>
+
         <input className="input" name="email" type="email" placeholder="Official company email" required />
-        <input className="input" name="password" type="password" placeholder="Password / temporary access code" required />
+        <input className="input" name="password" type="password" placeholder="Password" required />
+
         {message ? <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-700">{message}</p> : null}
+
         <button className="btn-primary" type="submit">
           Login
         </button>
-        <div className="flex justify-between text-sm">
-          <Link href="/signup">Self signup</Link>
-          <Link href="/forgot-password">Forgot password?</Link>
-        </div>
       </form>
     </section>
   );
