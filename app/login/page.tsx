@@ -38,10 +38,18 @@ export default function Login() {
   return (
     <main className="relative min-h-[calc(100vh-73px)] overflow-hidden px-4 py-4 sm:px-6">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(14,165,233,0.28),transparent_26%),radial-gradient(circle_at_82%_16%,rgba(16,185,129,0.28),transparent_25%),radial-gradient(circle_at_50%_95%,rgba(246,166,35,0.28),transparent_34%),linear-gradient(135deg,#f8fafc_0%,#eef6ff_45%,#fff7ed_100%)]" />
-      <div className="absolute left-[8%] top-[12%] h-36 w-36 animate-pulse rounded-full border border-sky-300/50" />
-      <div className="absolute right-[10%] top-[18%] h-24 w-24 animate-pulse rounded-full border border-emerald-300/60" />
+      <div className="pointer-events-none absolute inset-0 opacity-80">
+        <div className="absolute left-[7%] top-[9%] h-72 w-72 rounded-full border border-sky-300/40 motion-safe:animate-[spin_26s_linear_infinite]" />
+        <div className="absolute right-[8%] top-[12%] h-60 w-60 rounded-full border border-emerald-300/40 motion-safe:animate-[spin_22s_linear_infinite_reverse]" />
+        <div className="absolute bottom-[10%] left-[18%] h-80 w-80 rounded-full border border-amber-300/35 motion-safe:animate-[spin_34s_linear_infinite]" />
+        <div className="absolute left-[12%] top-[24%] h-3 w-3 rounded-full bg-sky-500 shadow-[0_0_35px_rgba(14,165,233,0.9)] motion-safe:animate-ping" />
+        <div className="absolute right-[22%] top-[28%] h-3 w-3 rounded-full bg-emerald-500 shadow-[0_0_35px_rgba(16,185,129,0.9)] motion-safe:animate-ping" />
+        <div className="absolute bottom-[22%] left-[38%] h-3 w-3 rounded-full bg-amber-500 shadow-[0_0_35px_rgba(246,166,35,0.9)] motion-safe:animate-ping" />
+        <div className="absolute left-[8%] top-[44%] h-px w-[32rem] rotate-12 bg-gradient-to-r from-transparent via-sky-400/45 to-transparent motion-safe:animate-pulse" />
+        <div className="absolute right-[4%] top-[52%] h-px w-[30rem] -rotate-12 bg-gradient-to-r from-transparent via-emerald-400/45 to-transparent motion-safe:animate-pulse" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,23,42,0.045)_1px,transparent_1px),linear-gradient(rgba(15,23,42,0.045)_1px,transparent_1px)] bg-[size:48px_48px] motion-safe:animate-[pulse_5s_ease-in-out_infinite]" />
+      </div>
       <div className="absolute bottom-[8%] left-[35%] h-44 w-44 animate-pulse rounded-full bg-saffron/20 blur-3xl" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(rgba(15,23,42,0.04)_1px,transparent_1px)] bg-[size:48px_48px]" />
 
       <section className="relative mx-auto flex min-h-[calc(100vh-105px)] w-full max-w-lg items-center justify-center">
         <div className="w-full rounded-[2rem] border border-white/80 bg-white/90 p-5 shadow-2xl shadow-slate-900/15 backdrop-blur-xl sm:p-7">
