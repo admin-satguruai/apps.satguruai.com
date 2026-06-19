@@ -8,15 +8,6 @@ export function Header() {
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-navy text-saffron">SA</span>
           <span>Satguru AI</span>
         </Link>
-
-        <div className="flex gap-2">
-          <Link href="/login" className="btn-secondary py-2">
-            Login
-          </Link>
-          <Link href="/signup" className="btn-primary py-2">
-            Self signup
-          </Link>
-        </div>
       </div>
     </header>
   );
