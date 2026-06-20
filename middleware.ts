@@ -22,7 +22,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  if (pathname.startsWith(adminPrefix) && !['admin', 'super_admin'].includes(role ?? '')) {
+  if (pathname.startsWith(adminPrefix) && !['user', 'admin', 'super_admin'].includes(role ?? '')) {
     return NextResponse.redirect(new URL('/dashboard?entry=portal', request.url));
   }
 
