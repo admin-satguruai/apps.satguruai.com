@@ -1,10 +1,7 @@
 import { cookies } from 'next/headers';
 import { User } from '@/types';
 
-export type SessionUser = User & {
-  picture?: string;
-  loginMethod?: 'google' | 'email';
-};
+export type SessionUser = User;
 
 function readCookie(name: string) {
   return cookies().get(name)?.value;
@@ -38,7 +35,7 @@ export function getSessionUser(): SessionUser | null {
 
   const name = decodeValue(readCookie('satguru_user_name')) || fallbackName(email);
   const picture = decodeValue(readCookie('satguru_user_picture')) || undefined;
-  const loginMethod = (decodeValue(readCookie('satguru_login_method')) || session) as SessionUser['loginMethod'];
+  const loginMethod = decodeValue(readCookie('satguru_login_method')) || session;
   const lastLogin = decodeValue(readCookie('satguru_last_login')) || new Date().toISOString();
   const role = (decodeValue(readCookie('satguru_role')) || 'user') as SessionUser['role'];
 
