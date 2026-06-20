@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 const publicPaths = ['/', '/login', '/signup', '/forgot-password', '/contact'];
-const publicApiPrefixes = ['/api/auth'];
+const publicApiPrefixes = ['/api/auth', '/api/debug'];
 const adminPrefix = '/admin';
 
 function isPublicPath(pathname: string) {
