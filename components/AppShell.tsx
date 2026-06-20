@@ -3,6 +3,7 @@ import { getSessionUser } from '@/lib/auth';
 
 const adminLinks = [
   'users',
+  'countries',
   'portals',
   'domains',
   'categories',
