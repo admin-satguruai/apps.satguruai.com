@@ -68,6 +68,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           <Link href="/profile">Profile</Link>
           <Link href="/support">Support</Link>
         </nav>
+        <div className="mt-5 border-t border-slate-200 pt-4">
+          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400">Admin</p>
+          <nav className="grid gap-2 text-sm font-medium">
+            <Link href="/admin">Admin console</Link>
+            <Link href="/admin/countries">Country Master</Link>
+          </nav>
+        </div>
       </aside>
       <section>{children}</section>
     </div>
