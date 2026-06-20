@@ -120,3 +120,61 @@ export const countryMasterRecords: CountryMasterRecord[] = [
     remarks: 'Reference country for education, travel, and reporting use cases.'
   }
 ];
+
+function getSupabaseConfig() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !serviceRoleKey) {
+    return null;
+  }
+
+  return { url: url.replace(/\/$/, ''), serviceRoleKey };
+}
+
+function normalizeCountry(row: Record<string, unknown>): CountryMasterRecord {
+  return {
+    id: String(row.id || row.country_id || row.countryId || crypto.randomUUID()),
+    countryId: String(row.country_id || row.countryId || 'CN-000'),
+    countryName: String(row.country_name || row.countryName || ''),
+    iso2: String(row.iso_code_2 || row.iso2 || '').toUpperCase(),
+    iso3: String(row.iso_code_3 || row.iso3 || '').toUpperCase(),
+    dialingCode: String(row.dialing_code || row.dialingCode || ''),
+    continent: String(row.continent || ''),
+    subcontinent: String(row.subcontinent || ''),
+    presenceStatus: String(row.presence_status || row.presenceStatus || 'No').toLowerCase() === 'yes' ? 'Yes' : 'No',
+    timeZones: String(row.time_zones || row.timeZones || ''),
+    status: String(row.status || 'Active').toLowerCase() === 'inactive' ? 'Inactive' : 'Active',
+    owner: String(row.owner_name || row.owner || 'admin@satguruai.com'),
+    createdBy: String(row.created_by || row.createdBy || 'System'),
+    lastModifiedBy: String(row.modified_by || row.lastModifiedBy || row.created_by || 'System'),
+    remarks: String(row.remarks || '')
+  };
+}
+
+export async function listCountryMasterRecords(): Promise<CountryMasterRecord[]> {
+  const config = getSupabaseConfig();
+
+  if (!config) {
+    return countryMasterRecords;
+  }
+
+  const response = await fetch(`${config.url}/rest/v1/countries?select=*&order=modified_at.desc`, {
+    headers: {
+      apikey: config.serviceRoleKey,
+      Authorization: `Bearer ${config.serviceRoleKey}`
+    },
+    cache: 'no-store'
+  });
+
+  if (!response.ok) {
+    return countryMasterRecords;
+  }
+
+  const data = await response.json();
+  if (!Array.isArray(data) || data.length === 0) {
+    return countryMasterRecords;
+  }
+
+  return data.map(normalizeCountry);
+}
