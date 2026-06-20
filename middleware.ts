@@ -2,10 +2,22 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 const publicPaths = ['/', '/login', '/signup', '/forgot-password', '/contact'];
 const publicApiPrefixes = ['/api/auth', '/api/debug'];
-const adminPrefix = '/admin';
+
+const temporaryMigrationOpenPrefixes = [
+  '/dashboard',
+  '/admin',
+  '/portals',
+  '/favorites',
+  '/profile',
+  '/support'
+];
 
 function isPublicPath(pathname: string) {
   return publicPaths.includes(pathname) || publicApiPrefixes.some((prefix) => pathname.startsWith(prefix));
+}
+
+function isTemporarilyOpen(pathname: string) {
+  return temporaryMigrationOpenPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 }
 
 export function middleware(request: NextRequest) {
@@ -14,7 +26,7 @@ export function middleware(request: NextRequest) {
   const hasSession = Boolean(request.cookies.get('satguru_session')?.value);
   const hasPortalEntry = searchParams.get('entry') === 'portal';
 
-  if (isPublicPath(pathname)) {
+  if (isPublicPath(pathname) || isTemporarilyOpen(pathname)) {
     return NextResponse.next();
   }
 
@@ -22,7 +34,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  if (pathname.startsWith(adminPrefix) && !['user', 'admin', 'super_admin'].includes(role ?? '')) {
+  if (pathname.startsWith('/admin') && !['user', 'admin', 'super_admin'].includes(role ?? '')) {
     return NextResponse.redirect(new URL('/dashboard?entry=portal', request.url));
   }
 
