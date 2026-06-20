@@ -19,7 +19,7 @@ type GoogleUserInfo = {
 };
 
 function getBaseUrl(request: Request) {
-  return process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin;
+  return new URL(request.url).origin;
 }
 
 function isAllowedEmail(email: string) {
@@ -42,9 +42,7 @@ export async function GET(request: Request) {
   }
 
   if (!clientId || !clientSecret) {
-    return NextResponse.redirect(
-      new URL('/login?error=Google login is not configured. Add Google OAuth credentials in Vercel.', baseUrl)
-    );
+    return NextResponse.redirect(new URL('/login?error=Google login is not configured.', baseUrl));
   }
 
   try {
