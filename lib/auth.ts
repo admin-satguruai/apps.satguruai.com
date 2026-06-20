@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { User } from '@/types';
 
+export const PRIMARY_SUPER_ADMIN_EMAIL = 'admin@satguruai.com';
 export type SessionUser = User;
 
 function readCookie(name: string) {
@@ -25,6 +26,14 @@ function fallbackName(email: string) {
     .join(' ');
 }
 
+export function getEffectiveRole(email: string, cookieRole?: string) {
+  if (email.toLowerCase() === PRIMARY_SUPER_ADMIN_EMAIL) {
+    return 'super_admin' as const;
+  }
+
+  return (cookieRole || 'user') as SessionUser['role'];
+}
+
 export function getSessionUser(): SessionUser | null {
   const session = readCookie('satguru_session');
   const email = decodeValue(readCookie('satguru_user_email')).toLowerCase();
@@ -37,7 +46,8 @@ export function getSessionUser(): SessionUser | null {
   const picture = decodeValue(readCookie('satguru_user_picture')) || undefined;
   const loginMethod = decodeValue(readCookie('satguru_login_method')) || session;
   const lastLogin = decodeValue(readCookie('satguru_last_login')) || new Date().toISOString();
-  const role = (decodeValue(readCookie('satguru_role')) || 'user') as SessionUser['role'];
+  const cookieRole = decodeValue(readCookie('satguru_role'));
+  const role = getEffectiveRole(email, cookieRole);
 
   return {
     id: `google-${email}`,
