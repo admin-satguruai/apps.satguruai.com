@@ -27,9 +27,9 @@ export default async function CountriesPage() {
     <AdminShell>
       <MasterDataTable
         title="Country Master"
-        description="Central country reference master for Satguru business lines, branches, reporting, dropdowns, and future access segmentation. Country remains independent and follows the reusable table-first master-module framework."
+        description="Manage all countries used across Satguru AI for branches, reporting, access segmentation, dropdowns, and future enterprise master-data governance. Country remains an independent global reference master."
         createLabel="+ Create Country"
-        searchPlaceholder="Search countries by name, ID, ISO code, dialing code, continent, owner, or remarks..."
+        searchPlaceholder="Search countries, ISO code, dialing code, continent, owner, or remarks..."
         columns={columns}
         rows={countries}
         primaryKey="countryName"
