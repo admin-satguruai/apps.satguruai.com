@@ -8,6 +8,19 @@ type PortalUserPayload = {
   last_login?: string;
 };
 
+export type PortalUserRecord = {
+  id: string;
+  email: string;
+  name: string | null;
+  picture: string | null;
+  role: string | null;
+  status: string | null;
+  login_method: string | null;
+  last_login: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+};
+
 function getSupabaseConfig() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -19,8 +32,41 @@ function getSupabaseConfig() {
   return { url: url.replace(/\/$/, ''), serviceRoleKey };
 }
 
+function getSupabaseHeaders(config: { serviceRoleKey: string }) {
+  return {
+    apikey: config.serviceRoleKey,
+    Authorization: `Bearer ${config.serviceRoleKey}`
+  };
+}
+
 export function isSupabaseConfigured() {
   return Boolean(getSupabaseConfig());
+}
+
+export async function getPortalUserByEmail(email: string): Promise<PortalUserRecord | null> {
+  const config = getSupabaseConfig();
+
+  if (!config) {
+    return null;
+  }
+
+  const cleanEmail = email.toLowerCase().trim();
+  const response = await fetch(
+    `${config.url}/rest/v1/portal_users?email=eq.${encodeURIComponent(cleanEmail)}&select=*&limit=1`,
+    {
+      headers: getSupabaseHeaders(config),
+      cache: 'no-store'
+    }
+  );
+
+  if (!response.ok) {
+    const details = await response.text();
+    console.error('Unable to read portal user from Supabase:', details);
+    return null;
+  }
+
+  const data = await response.json();
+  return Array.isArray(data) && data.length > 0 ? data[0] : null;
 }
 
 export async function upsertPortalUser(user: PortalUserPayload) {
@@ -31,13 +77,15 @@ export async function upsertPortalUser(user: PortalUserPayload) {
   }
 
   const now = new Date().toISOString();
+  const cleanEmail = user.email.toLowerCase().trim();
+  const existingUser = await getPortalUserByEmail(cleanEmail);
   const payload = {
-    email: user.email.toLowerCase(),
+    email: cleanEmail,
     name: user.name,
-    picture: user.picture ?? null,
-    role: user.role ?? 'user',
-    status: user.status ?? 'active',
-    login_method: user.login_method ?? 'google',
+    picture: user.picture ?? existingUser?.picture ?? null,
+    role: existingUser?.role ?? user.role ?? 'user',
+    status: existingUser?.status ?? user.status ?? 'active',
+    login_method: user.login_method ?? existingUser?.login_method ?? 'google',
     last_login: user.last_login ?? now,
     updated_at: now
   };
@@ -45,8 +93,7 @@ export async function upsertPortalUser(user: PortalUserPayload) {
   const response = await fetch(`${config.url}/rest/v1/portal_users?on_conflict=email`, {
     method: 'POST',
     headers: {
-      apikey: config.serviceRoleKey,
-      Authorization: `Bearer ${config.serviceRoleKey}`,
+      ...getSupabaseHeaders(config),
       'Content-Type': 'application/json',
       Prefer: 'resolution=merge-duplicates,return=representation'
     },
@@ -63,7 +110,7 @@ export async function upsertPortalUser(user: PortalUserPayload) {
   return { saved: true, user: Array.isArray(data) ? data[0] : data };
 }
 
-export async function listPortalUsers() {
+export async function listPortalUsers(): Promise<PortalUserRecord[]> {
   const config = getSupabaseConfig();
 
   if (!config) {
@@ -71,10 +118,7 @@ export async function listPortalUsers() {
   }
 
   const response = await fetch(`${config.url}/rest/v1/portal_users?select=*&order=last_login.desc`, {
-    headers: {
-      apikey: config.serviceRoleKey,
-      Authorization: `Bearer ${config.serviceRoleKey}`
-    },
+    headers: getSupabaseHeaders(config),
     cache: 'no-store'
   });
 
