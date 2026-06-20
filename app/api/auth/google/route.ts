@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 const googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
 
 function getBaseUrl(request: Request) {
-  return process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin;
+  return new URL(request.url).origin;
 }
 
 export async function GET(request: Request) {
@@ -11,9 +11,7 @@ export async function GET(request: Request) {
   const baseUrl = getBaseUrl(request);
 
   if (!clientId) {
-    return NextResponse.redirect(
-      new URL('/login?error=Google login is not configured. Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Vercel.', baseUrl)
-    );
+    return NextResponse.redirect(new URL('/login?error=Google login is not configured.', baseUrl));
   }
 
   const redirectUri = `${baseUrl}/api/auth/google/callback`;
