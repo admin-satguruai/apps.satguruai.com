@@ -1,6 +1,6 @@
 import { AdminShell } from '@/components/AppShell';
 import { MasterColumn, MasterDataTable } from '@/components/MasterDataTable';
-import { CountryMasterRecord, countryMasterRecords } from '@/lib/countries';
+import { CountryMasterRecord, listCountryMasterRecords } from '@/lib/countries';
 
 const columns: MasterColumn<CountryMasterRecord>[] = [
   { key: 'countryName', label: 'Country Name', locked: true },
@@ -19,7 +19,10 @@ const columns: MasterColumn<CountryMasterRecord>[] = [
   { key: 'remarks', label: 'Remarks', defaultVisible: false }
 ];
 
-export default function CountriesPage() {
+export default async function CountriesPage() {
+  const countries = await listCountryMasterRecords();
+  const continents = Array.from(new Set(countries.map((country) => country.continent).filter(Boolean))).sort();
+
   return (
     <AdminShell>
       <MasterDataTable
@@ -28,11 +31,11 @@ export default function CountriesPage() {
         createLabel="+ Create Country"
         searchPlaceholder="Search countries by name, ID, ISO code, dialing code, continent, owner, or remarks..."
         columns={columns}
-        rows={countryMasterRecords}
+        rows={countries}
         primaryKey="countryName"
         searchKeys={['countryName', 'countryId', 'iso2', 'iso3', 'dialingCode', 'continent', 'subcontinent', 'owner', 'remarks']}
         filters={[
-          { key: 'continent', label: 'Continent', options: ['Asia', 'Africa', 'Europe'] },
+          { key: 'continent', label: 'Continent', options: continents.length ? continents : ['Asia', 'Africa', 'Europe'] },
           { key: 'presenceStatus', label: 'Presence Status', options: ['Yes', 'No'] },
           { key: 'status', label: 'Country Status', options: ['Active', 'Inactive'] }
         ]}
