@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { FormEvent, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 const allowedDomains = ['satgurutravel.com', 'satguruai.com'];
 
@@ -19,10 +18,10 @@ function GoogleMark() {
 }
 
 export default function Login() {
-  const router = useRouter();
   const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -32,20 +31,34 @@ export default function Login() {
     }
   }, []);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage('');
+    setIsSubmitting(true);
 
     const form = new FormData(event.currentTarget);
     const email = String(form.get('email') ?? '').trim().toLowerCase();
 
     if (!isAllowedEmail(email)) {
       setMessage('Only approved Satguru domains can access this portal.');
+      setIsSubmitting(false);
       return;
     }
 
-    router.push('/dashboard?entry=portal');
-    router.refresh();
+    const response = await fetch('/api/auth/email-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+
+    if (!response.ok) {
+      const result = await response.json().catch(() => ({ message: 'Unable to create login session.' }));
+      setMessage(result.message || 'Unable to create login session.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    window.location.href = '/dashboard';
   }
 
   function startGoogleLogin() {
@@ -126,7 +139,7 @@ export default function Login() {
 
                 {message ? <p className="rounded-xl border border-amber-200 bg-amber-50 p-2.5 text-base text-amber-800">{message}</p> : null}
 
-                <button className="rounded-xl bg-emerald-700 px-5 py-2.5 text-lg font-black text-white shadow-lg shadow-emerald-700/20 hover:bg-emerald-800" type="submit">Login →</button>
+                <button className="rounded-xl bg-emerald-700 px-5 py-2.5 text-lg font-black text-white shadow-lg shadow-emerald-700/20 hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-400" disabled={isSubmitting} type="submit">{isSubmitting ? 'Creating session...' : 'Login →'}</button>
               </form>
 
               <div className="my-3 flex items-center gap-3 text-base text-slate-700 lg:my-4">
