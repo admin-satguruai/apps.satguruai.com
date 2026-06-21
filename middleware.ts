@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-const publicPaths = ['/', '/login', '/signup', '/forgot-password', '/contact'];
+const publicPaths = ['/', '/login', '/signup', '/verify-otp', '/set-password', '/forgot-password', '/reset-password', '/contact'];
 const publicApiPrefixes = ['/api/auth', '/api/debug'];
 
 const temporaryMigrationOpenPrefixes = [
