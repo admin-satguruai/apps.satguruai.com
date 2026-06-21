@@ -24,19 +24,13 @@ export default function Verify() {
     const otp = String(form.get('otp') ?? '').trim();
     const verificationToken = sessionStorage.getItem('satguru_verification_token') ?? '';
 
-    if (!email.endsWith('@satgurutravel.com')) {
-      setMessage('Verification is allowed only with an official @satgurutravel.com email ID.');
-      setIsSubmitting(false);
-      return;
-    }
-
     const response = await fetch('/api/auth/verify-otp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, otp, verificationToken })
     });
 
-    const data = await response.json();
+    const data = await response.json().catch(() => ({ message: 'OTP verification failed.' }));
     setIsSubmitting(false);
 
     if (!response.ok) {
@@ -45,24 +39,24 @@ export default function Verify() {
     }
 
     sessionStorage.removeItem('satguru_verification_token');
-    router.push('/dashboard');
-    router.refresh();
+    sessionStorage.setItem('satguru_password_setup_token', data.passwordSetupToken);
+    router.push(`/set-password?email=${encodeURIComponent(email)}`);
   }
 
   return (
-    <section className="mx-auto max-w-md px-4 py-16">
-      <form className="card grid gap-4" onSubmit={handleSubmit}>
-        <h1 className="text-3xl font-black text-navy">Verify email OTP</h1>
-        <p className="text-sm text-slate-600">
-          Enter the OTP sent to your official @satgurutravel.com email ID.
-        </p>
-        <input className="input" name="email" type="email" value={emailFromQuery} onChange={(event) => setEmailFromQuery(event.target.value)} placeholder="Official email" required />
-        <input className="input" name="otp" inputMode="numeric" maxLength={6} placeholder="6-digit OTP" required />
-        {message ? <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-700">{message}</p> : null}
-        <button className="btn-primary" disabled={isSubmitting} type="submit">
-          {isSubmitting ? 'Verifying...' : 'Verify and enter portal'}
-        </button>
-      </form>
-    </section>
+    <main className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-orange-50 px-4 py-12">
+      <section className="mx-auto max-w-md rounded-3xl border border-white/80 bg-white/95 p-6 shadow-2xl shadow-slate-900/10">
+        <form className="grid gap-4" onSubmit={handleSubmit}>
+          <h1 className="text-3xl font-black text-slate-950">Verify email OTP</h1>
+          <p className="text-sm leading-6 text-slate-600">Enter the six-digit OTP sent to your approved official email ID.</p>
+          <input className="input" name="email" type="email" value={emailFromQuery} onChange={(event) => setEmailFromQuery(event.target.value)} placeholder="Official email" required />
+          <input className="input" name="otp" inputMode="numeric" maxLength={6} placeholder="6-digit OTP" required />
+          {message ? <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-700">{message}</p> : null}
+          <button className="btn-primary disabled:cursor-wait disabled:opacity-70" disabled={isSubmitting} type="submit">
+            {isSubmitting ? 'Verifying OTP...' : 'Verify OTP'}
+          </button>
+        </form>
+      </section>
+    </main>
   );
 }
