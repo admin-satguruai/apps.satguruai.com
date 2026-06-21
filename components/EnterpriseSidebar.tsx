@@ -87,10 +87,19 @@ function Chevron({ open }: { open: boolean }) {
   return <span className={`ml-auto text-slate-400 transition ${open ? 'rotate-90' : ''}`}>›</span>;
 }
 
+function SatguruWordmark({ className = '' }: { className?: string }) {
+  return (
+    <span className={`inline-flex items-baseline font-black leading-none tracking-[-0.06em] ${className}`}>
+      <span className="text-emerald-700">Satguru</span>
+      <span className="text-orange-500">AI</span>
+    </span>
+  );
+}
+
 function Wordmark() {
   return (
     <Link href="/dashboard" className="flex min-w-0 items-center" aria-label="Go to home">
-      <img src="/logos/satguru-ai-logo.svg" alt="SatguruAI" className="h-10 w-auto max-w-[142px] object-contain" />
+      <SatguruWordmark className="text-[25px]" />
     </Link>
   );
 }
