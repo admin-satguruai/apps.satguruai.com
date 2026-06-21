@@ -24,10 +24,19 @@ function displayRole(role?: string) {
   return role ? role.replace('_', ' ') : 'workspace';
 }
 
+function SatguruWordmark({ className = '' }: { className?: string }) {
+  return (
+    <span className={`inline-flex items-baseline font-black leading-none tracking-[-0.06em] ${className}`}>
+      <span className="text-emerald-700">Satguru</span>
+      <span className="text-orange-500">AI</span>
+    </span>
+  );
+}
+
 function HeaderLogo() {
   return (
     <Link href="/dashboard" className="flex h-12 w-[178px] shrink-0 items-center rounded-2xl px-1 transition hover:bg-white/80" aria-label="Go to dashboard">
-      <img src="/logos/satguru-ai-logo.svg" alt="SatguruAI" className="h-11 w-auto object-contain" />
+      <SatguruWordmark className="text-[30px]" />
     </Link>
   );
 }
