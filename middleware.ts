@@ -1,41 +1,37 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-const publicPaths = ['/', '/login', '/signup', '/forgot-password', '/contact'];
-const publicApiPrefixes = ['/api/auth', '/api/debug'];
-
-const temporaryMigrationOpenPrefixes = [
-  '/dashboard',
-  '/admin',
-  '/portals',
-  '/favorites',
-  '/profile',
-  '/support'
-];
+const publicPaths = ['/', '/login', '/signup', '/verify-otp', '/forgot-password', '/contact'];
+const publicApiPrefixes = ['/api/auth'];
+const adminPrefixes = ['/admin', '/api/admin'];
+const adminRoles = ['admin', 'super_admin'];
 
 function isPublicPath(pathname: string) {
   return publicPaths.includes(pathname) || publicApiPrefixes.some((prefix) => pathname.startsWith(prefix));
 }
 
-function isTemporarilyOpen(pathname: string) {
-  return temporaryMigrationOpenPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+function isAdminPath(pathname: string) {
+  return adminPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 }
 
 export function middleware(request: NextRequest) {
-  const { pathname, searchParams } = request.nextUrl;
+  const { pathname } = request.nextUrl;
   const role = request.cookies.get('satguru_role')?.value;
   const hasSession = Boolean(request.cookies.get('satguru_session')?.value);
-  const hasPortalEntry = searchParams.get('entry') === 'portal';
 
-  if (isPublicPath(pathname) || isTemporarilyOpen(pathname)) {
+  if (isPublicPath(pathname)) {
     return NextResponse.next();
   }
 
-  if (!hasSession && !hasPortalEntry) {
+  if (!hasSession) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  if (pathname.startsWith('/admin') && !['user', 'admin', 'super_admin'].includes(role ?? '')) {
-    return NextResponse.redirect(new URL('/dashboard?entry=portal', request.url));
+  if (isAdminPath(pathname) && !adminRoles.includes(role ?? '')) {
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json({ message: 'Admin access required.' }, { status: 403 });
+    }
+
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   return NextResponse.next();
