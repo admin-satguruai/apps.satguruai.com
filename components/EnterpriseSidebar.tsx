@@ -2,31 +2,24 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-type SidebarUser = { name?: string; email?: string; role?: string; branch?: string; picture?: string; loginMethod?: string };
+type SidebarUser = {
+  name?: string;
+  email?: string;
+  role?: string;
+  branch?: string;
+  picture?: string;
+  loginMethod?: string;
+};
+
 type IconName =
   | 'dashboard'
   | 'portal'
-  | 'crm'
-  | 'sales'
-  | 'operations'
   | 'master'
   | 'country'
   | 'region'
   | 'branch'
-  | 'industry'
-  | 'supplier'
-  | 'currency'
-  | 'clients'
-  | 'contacts'
-  | 'leads'
-  | 'activities'
-  | 'marketing'
-  | 'campaigns'
-  | 'email'
-  | 'templates'
-  | 'sequences'
   | 'reports'
   | 'analytics'
   | 'ai'
@@ -34,8 +27,20 @@ type IconName =
   | 'settings'
   | 'audit'
   | 'support';
-type NavItem = { label: string; href: string; icon: IconName; badge?: string; ai?: boolean; children?: NavItem[] };
-type NavGroup = { title: string; items: NavItem[] };
+
+type NavItem = {
+  label: string;
+  href: string;
+  icon: IconName;
+  badge?: string;
+  ai?: boolean;
+  children?: NavItem[];
+};
+
+type NavGroup = {
+  title: string;
+  items: NavItem[];
+};
 
 const EXPANDED_WIDTH = '220px';
 const COLLAPSED_WIDTH = '72px';
@@ -45,14 +50,11 @@ const navGroups: NavGroup[] = [
     title: 'Main',
     items: [
       { label: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
-      { label: 'Portal Directory', href: '/portals', icon: 'portal' },
-      { label: 'CRM', href: '/crm', icon: 'crm' },
-      { label: 'Sales', href: '/sales', icon: 'sales' },
-      { label: 'Operations', href: '/operations', icon: 'operations' }
+      { label: 'Portal Directory', href: '/portals', icon: 'portal' }
     ]
   },
   {
-    title: 'Business Modules',
+    title: 'Administration',
     items: [
       {
         label: 'Master Data',
@@ -61,32 +63,7 @@ const navGroups: NavGroup[] = [
         children: [
           { label: 'Country', href: '/admin/countries', icon: 'country' },
           { label: 'Region', href: '/admin/regions', icon: 'region' },
-          { label: 'Branch', href: '/admin/branches', icon: 'branch' },
-          { label: 'Industry', href: '/admin/industries', icon: 'industry' },
-          { label: 'Supplier', href: '/admin/suppliers', icon: 'supplier' },
-          { label: 'Currency', href: '/admin/currencies', icon: 'currency' }
-        ]
-      },
-      {
-        label: 'CRM Data',
-        href: '/clients',
-        icon: 'crm',
-        children: [
-          { label: 'Clients', href: '/clients', icon: 'clients' },
-          { label: 'Contacts', href: '/contacts', icon: 'contacts' },
-          { label: 'Leads', href: '/leads', icon: 'leads' },
-          { label: 'Activities', href: '/activities', icon: 'activities' }
-        ]
-      },
-      {
-        label: 'Marketing',
-        href: '/campaigns',
-        icon: 'marketing',
-        children: [
-          { label: 'Campaigns', href: '/campaigns', icon: 'campaigns', badge: '12' },
-          { label: 'Email', href: '/email', icon: 'email' },
-          { label: 'Templates', href: '/templates', icon: 'templates' },
-          { label: 'Sequences', href: '/sequences', icon: 'sequences' }
+          { label: 'Branch', href: '/admin/branches', icon: 'branch' }
         ]
       },
       { label: 'Reports', href: '/reports', icon: 'reports' },
@@ -139,57 +116,89 @@ function ModuleGlyph({ name }: { name: IconName }) {
 
   switch (name) {
     case 'dashboard':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M4 13h7V4H4v9Zm9 7h7V4h-7v16ZM4 20h7v-5H4v5Z" strokeLinejoin="round" /></svg>;
+      return (
+        <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <path d="M4 13h7V4H4v9Zm9 7h7V4h-7v16ZM4 20h7v-5H4v5Z" strokeLinejoin="round" />
+        </svg>
+      );
     case 'portal':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M4 6h16v12H4z" /><path d="M8 10h8M8 14h5" strokeLinecap="round" /></svg>;
-    case 'crm':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M17 20v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" /><circle cx="10" cy="7" r="4" /><path d="M21 20v-2a4 4 0 0 0-3-3.87M17 3.13a4 4 0 0 1 0 7.75" /></svg>;
-    case 'sales':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M4 19V5" strokeLinecap="round" /><path d="m4 19 6-6 4 4 6-9" strokeLinecap="round" strokeLinejoin="round" /><path d="M16 8h4v4" strokeLinecap="round" strokeLinejoin="round" /></svg>;
-    case 'operations':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z" /><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c.26.43.6.77 1 1 .33.2.7.3 1.1.3H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51.7Z" /></svg>;
+      return (
+        <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <path d="M4 6h16v12H4z" />
+          <path d="M8 10h8M8 14h5" strokeLinecap="round" />
+        </svg>
+      );
     case 'master':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" /><path d="M8 4v4M16 10v4M11 16v4" strokeLinecap="round" /></svg>;
+      return (
+        <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
+          <path d="M8 4v4M16 10v4M11 16v4" strokeLinecap="round" />
+        </svg>
+      );
     case 'country':
     case 'region':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.6 3.7 5.6 3.7 9S14.5 18.4 12 21M12 3C9.5 5.6 8.3 8.6 8.3 12S9.5 18.4 12 21" /></svg>;
+      return (
+        <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18M12 3c2.5 2.6 3.7 5.6 3.7 9S14.5 18.4 12 21M12 3C9.5 5.6 8.3 8.6 8.3 12S9.5 18.4 12 21" />
+        </svg>
+      );
     case 'branch':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M6 21V4h12v17" /><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1" strokeLinecap="round" /></svg>;
-    case 'industry':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M3 21h18M5 21V9l5 3V9l5 3V5h4v16" strokeLinejoin="round" /></svg>;
-    case 'supplier':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M3 7h11v10H3zM14 11h4l3 3v3h-7z" /><circle cx="7" cy="18" r="1.5" /><circle cx="18" cy="18" r="1.5" /></svg>;
-    case 'currency':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M12 3v18M17 7.5C15.7 6.6 14 6 12.2 6 9.9 6 8 7.1 8 9c0 4 8 2 8 6 0 1.9-1.9 3-4.2 3-1.8 0-3.6-.6-4.8-1.5" strokeLinecap="round" /></svg>;
-    case 'clients':
-    case 'contacts':
-    case 'users':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /></svg>;
-    case 'leads':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M12 21s7-4.4 7-11A7 7 0 1 0 5 10c0 6.6 7 11 7 11Z" /><circle cx="12" cy="10" r="2" /></svg>;
-    case 'activities':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M22 12h-4l-3 8-6-16-3 8H2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
-    case 'marketing':
-    case 'campaigns':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M4 13v-2l12-5v12L4 13Z" /><path d="M4 13l2 6h3l-1.5-5" strokeLinejoin="round" /><path d="M18 9a3 3 0 0 1 0 6" /></svg>;
-    case 'email':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M4 6h16v12H4z" /><path d="m4 7 8 6 8-6" /></svg>;
-    case 'templates':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M6 3h9l3 3v15H6z" /><path d="M14 3v4h4M8 12h8M8 16h6" /></svg>;
-    case 'sequences':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M7 7h10M7 12h10M7 17h10" strokeLinecap="round" /><circle cx="4" cy="7" r="1" /><circle cx="4" cy="12" r="1" /><circle cx="4" cy="17" r="1" /></svg>;
+      return (
+        <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <path d="M6 21V4h12v17" />
+          <path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1" strokeLinecap="round" />
+        </svg>
+      );
     case 'reports':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M5 3h14v18H5z" /><path d="M8 15h2v3H8zM11 11h2v7h-2zM14 13h2v5h-2zM8 7h8" /></svg>;
+      return (
+        <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <path d="M5 3h14v18H5z" />
+          <path d="M8 15h2v3H8zM11 11h2v7h-2zM14 13h2v5h-2zM8 7h8" />
+        </svg>
+      );
     case 'analytics':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M4 19V5M4 19h16" strokeLinecap="round" /><path d="M8 16v-4M12 16V8M16 16v-6" strokeLinecap="round" /></svg>;
+      return (
+        <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <path d="M4 19V5M4 19h16" strokeLinecap="round" />
+          <path d="M8 16v-4M12 16V8M16 16v-6" strokeLinecap="round" />
+        </svg>
+      );
     case 'ai':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M12 3l1.4 4.3L18 9l-4.6 1.7L12 15l-1.4-4.3L6 9l4.6-1.7L12 3ZM19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14ZM5 14l.8 2.2L8 17l-2.2.8L5 20l-.8-2.2L2 17l2.2-.8L5 14Z" strokeLinejoin="round" /></svg>;
+      return (
+        <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <path d="M12 3l1.4 4.3L18 9l-4.6 1.7L12 15l-1.4-4.3L6 9l4.6-1.7L12 3ZM19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14ZM5 14l.8 2.2L8 17l-2.2.8L5 20l-.8-2.2L2 17l2.2-.8L5 14Z" strokeLinejoin="round" />
+        </svg>
+      );
+    case 'users':
+      return (
+        <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+        </svg>
+      );
     case 'settings':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.18.6.6 1.05 1.2 1.2.26.07.53.1.8.1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51.7Z" /></svg>;
+      return (
+        <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.18.6.6 1.05 1.2 1.2.26.07.53.1.8.1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51.7Z" />
+        </svg>
+      );
     case 'audit':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="M6 3h12v18H6z" /><path d="M9 8h6M9 12h6M9 16h3" strokeLinecap="round" /></svg>;
+      return (
+        <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <path d="M6 3h12v18H6z" />
+          <path d="M9 8h6M9 12h6M9 16h3" strokeLinecap="round" />
+        </svg>
+      );
     case 'support':
-      return <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="9" /><path d="M9.5 9a2.8 2.8 0 0 1 5.2 1.4c0 1.9-2.2 2.4-2.7 3.8M12 18h.01" strokeLinecap="round" /></svg>;
+      return (
+        <svg className={common} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M9.5 9a2.8 2.8 0 0 1 5.2 1.4c0 1.9-2.2 2.4-2.7 3.8M12 18h.01" strokeLinecap="round" />
+        </svg>
+      );
   }
 }
 
@@ -304,12 +313,11 @@ function SidebarGroup({ group, expanded, query, onNavigate, onExpand }: { group:
   );
 }
 
-export function EnterpriseSidebar({ user }: { user: SidebarUser | null }) {
+export function EnterpriseSidebar({ user: _user }: { user: SidebarUser | null }) {
   const [expanded, setExpanded] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const allItems = useMemo(() => flatten(navGroups), []);
-  const quickMatches = query.trim() ? allItems.filter((item) => item.label.toLowerCase().includes(query.toLowerCase())).slice(0, 5) : [];
+  const quickMatches = query.trim() ? flatten(navGroups).filter((item) => item.label.toLowerCase().includes(query.toLowerCase())).slice(0, 5) : [];
   const sidebarWidth = COLLAPSED_WIDTH;
 
   useEffect(() => {
