@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
+import { SatguruFullLogo, SatguruIconLogo } from '@/components/SatguruLogo';
+
 type SidebarUser = { name?: string; email?: string; role?: string; branch?: string; picture?: string; loginMethod?: string };
 type IconName = 'dashboard' | 'crm' | 'sales' | 'ops' | 'master' | 'clients' | 'contacts' | 'leads' | 'campaigns' | 'activities' | 'reports' | 'analytics' | 'ai' | 'users' | 'settings' | 'audit' | 'country' | 'region' | 'branch' | 'industry' | 'supplier' | 'currency' | 'mail' | 'template' | 'sequence' | 'chevron' | 'menu' | 'search' | 'support' | 'portal';
 type NavItem = { label: string; href: string; icon: IconName; badge?: string; ai?: boolean; children?: NavItem[] };
@@ -107,6 +109,7 @@ function Icon({ name }: { name: IconName }) {
     support: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-5h.01M10 9a2 2 0 1 1 3.3 1.5c-.8.6-1.3 1.1-1.3 2.5'],
     portal: ['M4 5h16v14H4V5Zm4 4h8M8 13h5']
   };
+
   return <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">{paths[name].map((path) => <path key={path} d={path} strokeLinecap="round" strokeLinejoin="round" />)}</svg>;
 }
 
@@ -122,6 +125,7 @@ function flattenItems(groups: NavGroup[]) {
 function SidebarItem({ item, expanded, level = 0, onNavigate }: { item: NavItem; expanded: boolean; level?: number; onNavigate?: () => void }) {
   const pathname = usePathname();
   const active = isItemActive(pathname, item);
+
   return (
     <Link href={item.href} title={!expanded ? item.label : undefined} onClick={onNavigate} className={`group relative flex h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition duration-200 hover:translate-x-0.5 ${active ? 'bg-emerald-100 text-emerald-700' : item.ai ? 'bg-gradient-to-r from-emerald-700 to-orange-500 text-white shadow-sm' : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'} ${level > 0 && expanded ? 'ml-3' : ''}`}>
       {active ? <span className="absolute left-0 top-2 h-6 w-1 rounded-r-full bg-emerald-700" /> : null}
@@ -144,7 +148,9 @@ function SidebarGroup({ group, expanded, query, onNavigate }: { group: NavGroup;
     if (item.label.toLowerCase().includes(normalizedQuery) || childMatches?.length) return { ...item, children: childMatches || item.children };
     return null;
   }).filter(Boolean) as NavItem[];
+
   if (visibleItems.length === 0) return null;
+
   return (
     <section className="space-y-1.5">
       {expanded ? <p className="px-3 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">{group.title}</p> : null}
@@ -153,6 +159,7 @@ function SidebarGroup({ group, expanded, query, onNavigate }: { group: NavGroup;
           const hasChildren = Boolean(item.children?.length);
           const itemOpen = normalizedQuery ? true : (openGroups[item.label] ?? defaultOpen);
           if (!hasChildren) return <SidebarItem key={item.label} item={item} expanded={expanded} onNavigate={onNavigate} />;
+
           return (
             <div key={item.label}>
               <button title={!expanded ? item.label : undefined} className={`group relative flex h-10 w-full items-center gap-3 rounded-xl px-3 text-left text-sm font-semibold transition duration-200 hover:translate-x-0.5 ${isItemActive(pathname, item) ? 'bg-emerald-100 text-emerald-700' : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'}`} onClick={() => setOpenGroups((current) => ({ ...current, [item.label]: !itemOpen }))} type="button">
@@ -184,9 +191,8 @@ export function EnterpriseSidebar({ user }: { user: SidebarUser | null }) {
   const content = (
     <div className={`flex h-full flex-col border-r border-slate-200 bg-white shadow-[0_0_25px_rgba(15,23,42,0.06)] transition-all duration-300 ${widthClass}`} onMouseEnter={() => setHoverOpen(true)} onMouseLeave={() => setHoverOpen(false)}>
       <div className="flex h-[64px] shrink-0 items-center justify-between gap-2 border-b border-slate-100 px-3">
-        <Link href="/dashboard" className="flex min-w-0 items-center gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-slate-950 text-sm font-black text-orange-400">SA</span>
-          {expanded ? <span className="truncate text-lg font-black text-slate-950">Satguru AI</span> : null}
+        <Link href="/dashboard" className={`flex min-w-0 items-center ${expanded ? 'w-full justify-between gap-3' : 'w-full justify-center'}`} title="Satguru AI Dashboard">
+          {expanded ? <SatguruFullLogo className="h-8 w-auto max-w-[150px] object-contain" /> : <SatguruIconLogo className="h-10 w-10 object-contain" />}
         </Link>
         {expanded ? <button className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-slate-500 hover:bg-emerald-50 hover:text-emerald-700" onClick={() => setPinnedOpen((value) => !value)} type="button" aria-label="Pin sidebar"><Icon name="menu" /></button> : null}
       </div>
