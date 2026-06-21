@@ -29,14 +29,22 @@ export async function POST(request: Request) {
     const otp = makeOtp();
     const verificationToken = encodeToken({ purpose: 'signup_otp', email, otp, fullName, mobile, department, branch, country }, TOKEN_TTL_MS);
 
-    await sendEmail(
-      email,
-      'Satguru AI signup OTP',
-      `Your Satguru AI signup OTP is ${otp}. This OTP will expire in 10 minutes. If you did not request this, please ignore this email.`
-    );
+    try {
+      await sendEmail(
+        email,
+        'Satguru AI signup OTP',
+        `Your Satguru AI signup OTP is ${otp}. This OTP will expire in 10 minutes. If you did not request this, please ignore this email.`
+      );
+    } catch (emailError) {
+      const reason = emailError instanceof Error ? emailError.message : '';
+      if (reason.toLowerCase().includes('configured')) {
+        return NextResponse.json({ message: 'OTP email service is not configured yet. Please ask the administrator to configure RESEND_API_KEY and RESEND_FROM_EMAIL in Vercel environment variables.' }, { status: 503 });
+      }
+      return NextResponse.json({ message: 'Unable to send OTP email right now. Please try again later or contact administrator.' }, { status: 502 });
+    }
 
     return NextResponse.json({ message: 'OTP sent successfully to your official email ID.', verificationToken });
-  } catch (error) {
-    return NextResponse.json({ message: error instanceof Error ? error.message : 'Unable to send OTP. Please try again.' }, { status: 500 });
+  } catch {
+    return NextResponse.json({ message: 'Unable to send OTP. Please try again or contact administrator.' }, { status: 500 });
   }
 }
