@@ -3,6 +3,26 @@ import { NextResponse } from 'next/server';
 import { getPortalUserByEmail } from '@/lib/supabase-admin';
 import { ALLOWED_DOMAINS, TOKEN_TTL_MS, encodeToken, isAllowedEmail, makeOtp, normalizeEmail, sendEmail } from '@/lib/auth-flow';
 
+function smtpFailureMessage(error: unknown) {
+  const reason = error instanceof Error ? error.message : '';
+  const lowerReason = reason.toLowerCase();
+
+  if (lowerReason.includes('configured')) {
+    return 'OTP email service is not configured yet. Please configure SMTP_USER, SMTP_PASSWORD, EMAIL_FROM_ADDRESS, AUTH_SECRET, and NEXT_PUBLIC_APP_URL in Vercel environment variables.';
+  }
+
+  if (lowerReason.includes('invalid login') || lowerReason.includes('username and password not accepted') || lowerReason.includes('535')) {
+    return 'OTP email could not be sent because Google rejected the SMTP login. Please regenerate a Google App Password from noreply@satguruai.com and update SMTP_PASSWORD in Vercel. Do not use the normal mailbox password.';
+  }
+
+  if (lowerReason.includes('connection') || lowerReason.includes('timeout') || lowerReason.includes('etimedout') || lowerReason.includes('econn')) {
+    return 'OTP email could not be sent because the SMTP connection failed. Please check SMTP_HOST=smtp.gmail.com, SMTP_PORT=465, and SMTP_SECURE=true in Vercel, then redeploy.';
+  }
+
+  console.error('Signup OTP email failure:', reason);
+  return 'Unable to send OTP email right now. Please check Vercel Function Logs for the exact SMTP error and verify the Google App Password for noreply@satguruai.com.';
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -36,11 +56,7 @@ export async function POST(request: Request) {
         `Your Satguru AI signup OTP is ${otp}. This OTP will expire in 10 minutes. If you did not request this, please ignore this email.`
       );
     } catch (emailError) {
-      const reason = emailError instanceof Error ? emailError.message : '';
-      if (reason.toLowerCase().includes('configured')) {
-        return NextResponse.json({ message: 'OTP email service is not configured yet. Please ask the administrator to configure SMTP_USER, SMTP_PASSWORD, EMAIL_FROM_ADDRESS, AUTH_SECRET, and NEXT_PUBLIC_APP_URL in Vercel environment variables.' }, { status: 503 });
-      }
-      return NextResponse.json({ message: 'Unable to send OTP email right now. Please try again later or contact administrator.' }, { status: 502 });
+      return NextResponse.json({ message: smtpFailureMessage(emailError) }, { status: 502 });
     }
 
     return NextResponse.json({ message: 'OTP sent successfully to your official email ID.', verificationToken });
