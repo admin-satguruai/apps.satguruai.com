@@ -20,7 +20,10 @@ function PortalShell({ children }: { children: React.ReactNode }) {
             : null
         }
       />
-      <section className="min-w-0 pl-[72px] pt-[64px] transition-all duration-300">
+      <section
+        className="min-w-0 pt-[64px] transition-[padding] duration-300"
+        style={{ paddingLeft: 'var(--satguru-sidebar-width, 72px)' }}
+      >
         <div className="min-h-[calc(100vh-64px)] px-4 py-5 sm:px-6 lg:px-7 xl:px-8">
           {children}
         </div>
