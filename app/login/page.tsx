@@ -9,14 +9,6 @@ function isAllowedEmail(email: string) {
   return allowedDomains.some((domain) => email.endsWith(`@${domain}`));
 }
 
-function GoogleMark() {
-  return (
-    <span className="inline-grid h-5 w-5 place-items-center rounded-full bg-white text-[16px] font-black shadow-sm">
-      <span className="text-[#4285F4]">G</span>
-    </span>
-  );
-}
-
 export default function Login() {
   const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -84,8 +76,8 @@ export default function Login() {
                 <div className="absolute left-14 top-6 h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(16,185,129,0.75)]" />
                 <div className="absolute right-16 top-20 h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(16,185,129,0.75)]" />
                 <div className="absolute left-1/2 top-7 h-32 w-32 -translate-x-1/2 rounded-full border border-emerald-100 xl:h-36 xl:w-36" />
-                <div className="absolute inset-x-0 top-14 text-[clamp(2.5rem,4.5vw,4rem)] font-black leading-none tracking-tight xl:top-16">
-                  <span className="text-emerald-700">Satguru</span><span className="text-orange-500">AI</span>
+                <div className="absolute inset-x-0 top-14 flex justify-center xl:top-16">
+                  <img src="/logos/satguru-ai-logo.svg" alt="SatguruAI" className="h-20 w-auto max-w-[280px] object-contain" />
                 </div>
               </div>
               <h1 className="text-[clamp(1.45rem,2vw,2rem)] font-black leading-tight text-slate-950">Welcome back to Satguru AI</h1>
@@ -96,12 +88,12 @@ export default function Login() {
           <div className="flex min-h-0 items-center justify-center p-4 sm:p-5 lg:p-5 xl:p-6">
             <div className="w-full max-w-[520px]">
               <div className="mb-2 text-center lg:hidden">
-                <div className="text-3xl font-black leading-none sm:text-4xl"><span className="text-emerald-700">Satguru</span><span className="text-orange-500">AI</span></div>
+                <img src="/logos/satguru-ai-logo.svg" alt="SatguruAI" className="mx-auto h-14 w-auto object-contain" />
                 <p className="mt-1 text-sm text-slate-600">Welcome back! Sign in to access your Satguru AI home.</p>
               </div>
 
               <button className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-extrabold text-slate-900 shadow-sm hover:border-emerald-500 hover:bg-emerald-50 xl:py-2.5" onClick={startGoogleLogin} type="button">
-                <GoogleMark />
+                <img src="/logos/google-icon.svg" alt="" aria-hidden="true" className="h-5 w-5 object-contain" />
                 Continue with Google
               </button>
 
