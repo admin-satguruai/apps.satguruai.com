@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { getPortalUserByEmail } from '@/lib/supabase-admin';
-import { RESET_TTL_MS, decodeToken, encodeToken, isAllowedEmail, normalizeEmail, sendEmail } from '@/lib/auth-flow';
+import { RESET_TTL_MS, encodeToken, isAllowedEmail, normalizeEmail, sendEmail } from '@/lib/auth-flow';
 
 export async function POST(request: Request) {
   try {
@@ -28,9 +28,4 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ message: 'If this email is registered, a reset link has been sent.' });
   }
-}
-
-export function verifyResetToken(token: string, email: string) {
-  const payload = decodeToken(token);
-  return Boolean(payload && payload.purpose === 'reset_password' && payload.email === email);
 }
