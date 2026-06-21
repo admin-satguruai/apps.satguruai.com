@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
 type SidebarUser = { name?: string; email?: string; role?: string; branch?: string; picture?: string; loginMethod?: string };
-type IconName = 'dashboard' | 'crm' | 'sales' | 'marketing' | 'ops' | 'master' | 'clients' | 'contacts' | 'leads' | 'campaigns' | 'activities' | 'reports' | 'analytics' | 'ai' | 'users' | 'settings' | 'audit' | 'country' | 'region' | 'branch' | 'industry' | 'supplier' | 'currency' | 'mail' | 'template' | 'sequence' | 'chevron' | 'menu' | 'search' | 'profile' | 'support' | 'portal';
+type IconName = 'dashboard' | 'crm' | 'sales' | 'ops' | 'master' | 'clients' | 'contacts' | 'leads' | 'campaigns' | 'activities' | 'reports' | 'analytics' | 'ai' | 'users' | 'settings' | 'audit' | 'country' | 'region' | 'branch' | 'industry' | 'supplier' | 'currency' | 'mail' | 'template' | 'sequence' | 'chevron' | 'menu' | 'search' | 'support' | 'portal';
 type NavItem = { label: string; href: string; icon: IconName; badge?: string; ai?: boolean; children?: NavItem[] };
 type NavGroup = { title: string; items: NavItem[] };
 
@@ -50,7 +50,7 @@ const navGroups: NavGroup[] = [
       {
         label: 'Marketing',
         href: '/campaigns',
-        icon: 'marketing',
+        icon: 'campaigns',
         children: [
           { label: 'Campaigns', href: '/campaigns', icon: 'campaigns', badge: '12' },
           { label: 'Email', href: '/email', icon: 'mail' },
@@ -74,18 +74,11 @@ const navGroups: NavGroup[] = [
   }
 ];
 
-const recentItems: NavItem[] = [
-  { label: 'Country', href: '/admin/countries', icon: 'country' },
-  { label: 'Clients', href: '/clients', icon: 'clients' },
-  { label: 'Campaigns', href: '/campaigns', icon: 'campaigns' }
-];
-
 function Icon({ name }: { name: IconName }) {
   const paths: Record<IconName, string[]> = {
     dashboard: ['M4 5h6v6H4V5Zm10 0h6v6h-6V5ZM4 15h6v4H4v-4Zm10 0h6v4h-6v-4Z'],
     crm: ['M7 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm10 0a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM3 21v-2a5 5 0 0 1 5-5h0a5 5 0 0 1 5 5v2m-2-7h5a5 5 0 0 1 5 5v2'],
     sales: ['M4 19V5m0 14h16M8 16l3-4 3 2 5-7'],
-    marketing: ['M4 12h4l10-5v10L8 12H4Zm4 0v6'],
     ops: ['M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm8 4h-2M6 12H4m12.2-5.2-1.4 1.4M9.2 16.8l-1.4 1.4m0-11.4 1.4 1.4m5.6 5.6 1.4 1.4'],
     master: ['m12 3 9 5-9 5-9-5 9-5Zm-7 9 7 4 7-4M5 16l7 4 7-4'],
     clients: ['M3 21V5a2 2 0 0 1 2-2h10v18M9 7h2m-2 4h2m-2 4h2m6-6h2a2 2 0 0 1 2 2v10'],
@@ -111,21 +104,10 @@ function Icon({ name }: { name: IconName }) {
     chevron: ['m9 6 6 6-6 6'],
     menu: ['M4 6h16M4 12h16M4 18h16'],
     search: ['m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z'],
-    profile: ['M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0'],
     support: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-5h.01M10 9a2 2 0 1 1 3.3 1.5c-.8.6-1.3 1.1-1.3 2.5'],
     portal: ['M4 5h16v14H4V5Zm4 4h8M8 13h5']
   };
-
   return <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">{paths[name].map((path) => <path key={path} d={path} strokeLinecap="round" strokeLinejoin="round" />)}</svg>;
-}
-
-function initials(name?: string, email?: string) {
-  const source = name || email || 'SA';
-  return source.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join('');
-}
-
-function labelRole(role?: string) {
-  return role ? role.replace('_', ' ') : 'Workspace User';
 }
 
 function isItemActive(pathname: string, item: NavItem) {
@@ -137,21 +119,21 @@ function flattenItems(groups: NavGroup[]) {
   return groups.flatMap((group) => group.items.flatMap((item) => [item, ...(item.children || [])]));
 }
 
-function SidebarItem({ item, collapsed, level = 0, onNavigate }: { item: NavItem; collapsed: boolean; level?: number; onNavigate?: () => void }) {
+function SidebarItem({ item, expanded, level = 0, onNavigate }: { item: NavItem; expanded: boolean; level?: number; onNavigate?: () => void }) {
   const pathname = usePathname();
   const active = isItemActive(pathname, item);
   return (
-    <Link href={item.href} title={collapsed ? item.label : undefined} onClick={onNavigate} className={`group relative flex h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition duration-200 hover:translate-x-0.5 ${active ? 'bg-emerald-100 text-emerald-700' : item.ai ? 'bg-gradient-to-r from-emerald-700 to-orange-500 text-white shadow-sm' : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'} ${level > 0 && !collapsed ? 'ml-3' : ''}`}>
+    <Link href={item.href} title={!expanded ? item.label : undefined} onClick={onNavigate} className={`group relative flex h-10 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition duration-200 hover:translate-x-0.5 ${active ? 'bg-emerald-100 text-emerald-700' : item.ai ? 'bg-gradient-to-r from-emerald-700 to-orange-500 text-white shadow-sm' : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'} ${level > 0 && expanded ? 'ml-3' : ''}`}>
       {active ? <span className="absolute left-0 top-2 h-6 w-1 rounded-r-full bg-emerald-700" /> : null}
       <Icon name={item.icon} />
-      {!collapsed ? <span className="truncate">{item.label}</span> : null}
-      {!collapsed && item.badge ? <span className="ml-auto rounded-full bg-orange-500 px-2 py-0.5 text-[10px] font-black text-white">{item.badge}</span> : null}
-      {collapsed ? <span className="pointer-events-none absolute left-[64px] z-50 hidden rounded-lg bg-slate-950 px-3 py-2 text-xs font-bold text-white shadow-xl group-hover:block">{item.label}</span> : null}
+      {expanded ? <span className="truncate">{item.label}</span> : null}
+      {expanded && item.badge ? <span className="ml-auto rounded-full bg-orange-500 px-2 py-0.5 text-[10px] font-black text-white">{item.badge}</span> : null}
+      {!expanded ? <span className="pointer-events-none absolute left-[64px] z-50 hidden whitespace-nowrap rounded-lg bg-slate-950 px-3 py-2 text-xs font-bold text-white shadow-xl group-hover:block">{item.label}</span> : null}
     </Link>
   );
 }
 
-function SidebarGroup({ group, collapsed, query, onNavigate }: { group: NavGroup; collapsed: boolean; query: string; onNavigate?: () => void }) {
+function SidebarGroup({ group, expanded, query, onNavigate }: { group: NavGroup; expanded: boolean; query: string; onNavigate?: () => void }) {
   const pathname = usePathname();
   const defaultOpen = group.items.some((item) => isItemActive(pathname, item));
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
@@ -163,25 +145,24 @@ function SidebarGroup({ group, collapsed, query, onNavigate }: { group: NavGroup
     return null;
   }).filter(Boolean) as NavItem[];
   if (visibleItems.length === 0) return null;
-
   return (
     <section className="space-y-1.5">
-      {!collapsed ? <p className="px-3 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">{group.title}</p> : null}
+      {expanded ? <p className="px-3 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">{group.title}</p> : null}
       <div className="grid gap-1">
         {visibleItems.map((item) => {
           const hasChildren = Boolean(item.children?.length);
           const itemOpen = normalizedQuery ? true : (openGroups[item.label] ?? defaultOpen);
-          if (!hasChildren) return <SidebarItem key={item.label} item={item} collapsed={collapsed} onNavigate={onNavigate} />;
+          if (!hasChildren) return <SidebarItem key={item.label} item={item} expanded={expanded} onNavigate={onNavigate} />;
           return (
             <div key={item.label}>
-              <button title={collapsed ? item.label : undefined} className={`group relative flex h-10 w-full items-center gap-3 rounded-xl px-3 text-left text-sm font-semibold transition duration-200 hover:translate-x-0.5 ${isItemActive(pathname, item) ? 'bg-emerald-100 text-emerald-700' : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'}`} onClick={() => setOpenGroups((current) => ({ ...current, [item.label]: !itemOpen }))} type="button">
+              <button title={!expanded ? item.label : undefined} className={`group relative flex h-10 w-full items-center gap-3 rounded-xl px-3 text-left text-sm font-semibold transition duration-200 hover:translate-x-0.5 ${isItemActive(pathname, item) ? 'bg-emerald-100 text-emerald-700' : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'}`} onClick={() => setOpenGroups((current) => ({ ...current, [item.label]: !itemOpen }))} type="button">
                 {isItemActive(pathname, item) ? <span className="absolute left-0 top-2 h-6 w-1 rounded-r-full bg-emerald-700" /> : null}
                 <Icon name={item.icon} />
-                {!collapsed ? <span className="truncate">{item.label}</span> : null}
-                {!collapsed ? <span className={`ml-auto transition ${itemOpen ? 'rotate-90' : ''}`}><Icon name="chevron" /></span> : null}
-                {collapsed ? <span className="pointer-events-none absolute left-[64px] z-50 hidden rounded-lg bg-slate-950 px-3 py-2 text-xs font-bold text-white shadow-xl group-hover:block">{item.label}</span> : null}
+                {expanded ? <span className="truncate">{item.label}</span> : null}
+                {expanded ? <span className={`ml-auto transition ${itemOpen ? 'rotate-90' : ''}`}><Icon name="chevron" /></span> : null}
+                {!expanded ? <span className="pointer-events-none absolute left-[64px] z-50 hidden whitespace-nowrap rounded-lg bg-slate-950 px-3 py-2 text-xs font-bold text-white shadow-xl group-hover:block">{item.label}</span> : null}
               </button>
-              {itemOpen && !collapsed ? <div className="mt-1 grid gap-1">{item.children?.map((child) => <SidebarItem key={child.label} item={child} collapsed={collapsed} level={1} onNavigate={onNavigate} />)}</div> : null}
+              {itemOpen && expanded ? <div className="mt-1 grid gap-1">{item.children?.map((child) => <SidebarItem key={child.label} item={child} expanded={expanded} level={1} onNavigate={onNavigate} />)}</div> : null}
             </div>
           );
         })}
@@ -191,30 +172,32 @@ function SidebarGroup({ group, collapsed, query, onNavigate }: { group: NavGroup
 }
 
 export function EnterpriseSidebar({ user }: { user: SidebarUser | null }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [pinnedOpen, setPinnedOpen] = useState(false);
+  const [hoverOpen, setHoverOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState('');
   const allItems = useMemo(() => flattenItems(navGroups), []);
   const quickMatches = query.trim() ? allItems.filter((item) => item.label.toLowerCase().includes(query.toLowerCase())).slice(0, 5) : [];
-  const widthClass = collapsed ? 'w-[72px]' : 'w-[248px]';
+  const expanded = pinnedOpen || hoverOpen;
+  const widthClass = expanded ? 'w-[248px]' : 'w-[72px]';
 
   const content = (
-    <div className={`flex h-full flex-col border-r border-slate-200 bg-white shadow-[0_0_25px_rgba(15,23,42,0.04)] transition-all duration-300 ${widthClass}`}>
+    <div className={`flex h-full flex-col border-r border-slate-200 bg-white shadow-[0_0_25px_rgba(15,23,42,0.06)] transition-all duration-300 ${widthClass}`} onMouseEnter={() => setHoverOpen(true)} onMouseLeave={() => setHoverOpen(false)}>
       <div className="flex h-[64px] shrink-0 items-center justify-between gap-2 border-b border-slate-100 px-3">
         <Link href="/dashboard" className="flex min-w-0 items-center gap-3">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-slate-950 text-sm font-black text-orange-400">SA</span>
-          {!collapsed ? <span className="truncate text-lg font-black text-slate-950">Satguru AI</span> : null}
+          {expanded ? <span className="truncate text-lg font-black text-slate-950">Satguru AI</span> : null}
         </Link>
-        <button className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-slate-500 hover:bg-emerald-50 hover:text-emerald-700" onClick={() => setCollapsed((value) => !value)} type="button" aria-label="Toggle sidebar"><Icon name="menu" /></button>
+        {expanded ? <button className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-slate-500 hover:bg-emerald-50 hover:text-emerald-700" onClick={() => setPinnedOpen((value) => !value)} type="button" aria-label="Pin sidebar"><Icon name="menu" /></button> : null}
       </div>
-      {!collapsed ? <div className="px-3 py-3"><div className="relative"><span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><Icon name="search" /></span><input className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm font-semibold outline-none focus:border-emerald-700 focus:ring-4 focus:ring-emerald-700/10" placeholder="Search modules..." value={query} onChange={(event) => setQuery(event.target.value)} /></div>{quickMatches.length ? <div className="mt-2 rounded-xl border border-slate-100 bg-white p-2 shadow-sm">{quickMatches.map((item) => <Link key={`${item.href}-${item.label}`} className="block rounded-lg px-3 py-2 text-xs font-bold text-slate-600 hover:bg-emerald-50" href={item.href}>{item.label}</Link>)}</div> : null}</div> : null}
+
+      {expanded ? <div className="px-3 py-3"><div className="relative"><span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><Icon name="search" /></span><input className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm font-semibold outline-none focus:border-emerald-700 focus:ring-4 focus:ring-emerald-700/10" placeholder="Search modules..." value={query} onChange={(event) => setQuery(event.target.value)} /></div>{quickMatches.length ? <div className="mt-2 rounded-xl border border-slate-100 bg-white p-2 shadow-sm">{quickMatches.map((item) => <Link key={`${item.href}-${item.label}`} className="block rounded-lg px-3 py-2 text-xs font-bold text-slate-600 hover:bg-emerald-50" href={item.href}>{item.label}</Link>)}</div> : null}</div> : null}
+
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-2.5 py-3">
-        {!collapsed ? <section className="space-y-1.5"><p className="px-3 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Recent</p><div className="grid gap-1">{recentItems.map((item) => <SidebarItem key={item.label} item={item} collapsed={collapsed} onNavigate={() => setMobileOpen(false)} />)}</div></section> : null}
-        {navGroups.map((group) => <SidebarGroup key={group.title} group={group} collapsed={collapsed} query={query} onNavigate={() => setMobileOpen(false)} />)}
+        {navGroups.map((group) => <SidebarGroup key={group.title} group={group} expanded={expanded} query={query} onNavigate={() => setMobileOpen(false)} />)}
       </div>
-      <div className="shrink-0 border-t border-slate-100 p-2.5"><div className={`relative rounded-2xl border border-slate-200 bg-slate-50 p-3 ${collapsed ? 'grid place-items-center' : ''}`}><div className="flex items-center gap-3">{user?.picture ? <img src={user.picture} alt="Profile" className="h-10 w-10 rounded-full object-cover" /> : <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-slate-950 text-xs font-black text-orange-400">{initials(user?.name, user?.email)}</div>}{!collapsed ? <div className="min-w-0"><p className="truncate text-sm font-black text-slate-950">{user?.name || 'Satguru User'}</p><p className="truncate text-xs font-semibold capitalize text-slate-500">{labelRole(user?.role)} · {user?.branch || 'Pune HO'}</p></div> : null}</div>{!collapsed ? <div className="mt-3 grid grid-cols-2 gap-2"><Link href="/profile" className="rounded-xl bg-white px-3 py-2 text-center text-xs font-black text-slate-700 hover:bg-emerald-50">Profile</Link><Link href="/api/auth/logout" className="rounded-xl bg-white px-3 py-2 text-center text-xs font-black text-slate-700 hover:bg-emerald-50">Logout</Link></div> : null}</div></div>
     </div>
   );
 
-  return <><button className="fixed bottom-5 left-5 z-50 grid h-12 w-12 place-items-center rounded-2xl bg-emerald-700 text-white shadow-xl lg:hidden" onClick={() => setMobileOpen(true)} type="button" aria-label="Open sidebar"><Icon name="menu" /></button><aside className="hidden h-[calc(100vh-72px)] shrink-0 lg:block">{content}</aside>{mobileOpen ? <div className="fixed inset-0 z-[70] bg-slate-950/40 backdrop-blur-sm lg:hidden"><div className="h-full w-[248px]">{content}</div><button className="absolute right-4 top-4 rounded-xl bg-white px-4 py-2 text-sm font-black text-slate-900" onClick={() => setMobileOpen(false)} type="button">Close</button></div> : null}</>;
+  return <><button className="fixed bottom-5 left-5 z-50 grid h-12 w-12 place-items-center rounded-2xl bg-emerald-700 text-white shadow-xl lg:hidden" onClick={() => setMobileOpen(true)} type="button" aria-label="Open sidebar"><Icon name="menu" /></button><aside className="fixed left-0 top-0 z-[60] hidden h-screen shrink-0 lg:block">{content}</aside>{mobileOpen ? <div className="fixed inset-0 z-[70] bg-slate-950/40 backdrop-blur-sm lg:hidden"><div className="h-full w-[248px]">{content}</div><button className="absolute right-4 top-4 rounded-xl bg-white px-4 py-2 text-sm font-black text-slate-900" onClick={() => setMobileOpen(false)} type="button">Close</button></div> : null}</>;
 }
