@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { User } from '@/types';
+import { decodeSessionToken, fallbackName } from '@/lib/auth-flow';
 
 export const PRIMARY_SUPER_ADMIN_EMAIL = 'admin@satguruai.com';
 export type SessionUser = User;
@@ -8,60 +9,41 @@ function readCookie(name: string) {
   return cookies().get(name)?.value;
 }
 
-function decodeValue(value?: string) {
-  if (!value) return '';
-  try {
-    return decodeURIComponent(value);
-  } catch {
-    return value;
-  }
-}
-
-function fallbackName(email: string) {
-  const localPart = email.split('@')[0] || 'Satguru User';
-  return localPart
-    .split(/[._-]+/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
-}
-
-export function getEffectiveRole(email: string, cookieRole?: string) {
+export function getEffectiveRole(email: string, tokenRole?: string) {
   if (email.toLowerCase() === PRIMARY_SUPER_ADMIN_EMAIL) {
     return 'super_admin' as const;
   }
 
-  return (cookieRole || 'user') as SessionUser['role'];
+  return (tokenRole || 'user') as SessionUser['role'];
 }
 
 export function getSessionUser(): SessionUser | null {
-  const session = readCookie('satguru_session');
-  const email = decodeValue(readCookie('satguru_user_email')).toLowerCase();
+  const payload = decodeSessionToken(readCookie('satguru_session') || '');
 
-  if (!session || !email) {
+  if (!payload) {
     return null;
   }
 
-  const name = decodeValue(readCookie('satguru_user_name')) || fallbackName(email);
-  const picture = decodeValue(readCookie('satguru_user_picture')) || undefined;
-  const loginMethod = decodeValue(readCookie('satguru_login_method')) || session;
-  const lastLogin = decodeValue(readCookie('satguru_last_login')) || new Date().toISOString();
-  const cookieRole = decodeValue(readCookie('satguru_role'));
-  const role = getEffectiveRole(email, cookieRole);
+  const email = payload.email.toLowerCase();
+  const role = getEffectiveRole(email, payload.role);
 
   return {
-    id: `google-${email}`,
-    name,
+    id: `satguru-${email}`,
+    name: payload.name || fallbackName(email),
     email,
-    picture,
-    loginMethod,
+    picture: payload.picture,
+    loginMethod: payload.loginMethod,
     role,
-    department: 'Auto-created by Google login',
-    branch: 'To be updated',
-    country: 'To be updated',
+    department: payload.department || 'To be updated',
+    branch: payload.branch || 'To be updated',
+    country: payload.country || 'To be updated',
     status: 'active',
-    lastLogin
+    lastLogin: payload.lastLogin
   };
+}
+
+export function isAdminRole(role?: string | null) {
+  return role === 'admin' || role === 'super_admin';
 }
 
 export function getUsersWithSessionUser(seedUsers: User[]) {
