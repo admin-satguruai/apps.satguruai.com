@@ -28,6 +28,7 @@ type NavGroup = {
   items: NavItem[];
 };
 
+const EXPANDED_WIDTH = '220px';
 const COLLAPSED_WIDTH = '72px';
 
 const navGroups: NavGroup[] = [
@@ -229,18 +230,18 @@ function SidebarGroup({ group, expanded, query, onNavigate, onExpand }: { group:
 }
 
 export function EnterpriseSidebar({ user: _user }: { user: SidebarUser | null }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState('');
   const quickMatches = query.trim() ? flatten(navGroups).filter((item) => item.label.toLowerCase().includes(query.toLowerCase())).slice(0, 5) : [];
+  const sidebarWidth = expanded ? EXPANDED_WIDTH : COLLAPSED_WIDTH;
 
   useEffect(() => {
-    document.documentElement.style.setProperty('--satguru-sidebar-width', COLLAPSED_WIDTH);
-    return () => document.documentElement.style.setProperty('--satguru-sidebar-width', COLLAPSED_WIDTH);
-  }, []);
+    document.documentElement.style.setProperty('--satguru-sidebar-width', sidebarWidth);
+    return () => document.documentElement.style.setProperty('--satguru-sidebar-width', EXPANDED_WIDTH);
+  }, [sidebarWidth]);
 
   const closeAfterNavigation = () => {
-    setExpanded(false);
     setMobileOpen(false);
   };
 
@@ -278,7 +279,6 @@ export function EnterpriseSidebar({ user: _user }: { user: SidebarUser | null })
       <button className="fixed bottom-5 left-5 z-50 grid h-12 w-12 place-items-center rounded-2xl bg-emerald-700 text-white shadow-xl lg:hidden" onClick={() => setMobileOpen(true)} type="button" aria-label="Open sidebar">
         <MenuIcon />
       </button>
-      {expanded ? <button className="fixed inset-0 left-[72px] z-[55] hidden bg-slate-950/10 backdrop-blur-[1px] lg:block" aria-label="Close sidebar overlay" onClick={() => setExpanded(false)} type="button" /> : null}
       <aside className="fixed left-0 top-0 z-[60] hidden h-screen shrink-0 lg:block">{content}</aside>
       {mobileOpen ? (
         <div className="fixed inset-0 z-[70] bg-slate-950/40 backdrop-blur-sm lg:hidden">
