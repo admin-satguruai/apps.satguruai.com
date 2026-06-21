@@ -3,19 +3,12 @@
 import Link from 'next/link';
 import { FormEvent, useEffect, useState } from 'react';
 
+import { SatguruLogo } from '@/components/BrandLogo';
+
 const allowedDomains = ['satgurutravel.com', 'satguruai.com'];
 
 function isAllowedEmail(email: string) {
   return allowedDomains.some((domain) => email.endsWith(`@${domain}`));
-}
-
-function SatguruWordmark({ className = '' }: { className?: string }) {
-  return (
-    <span className={`inline-flex items-baseline font-black leading-none tracking-[-0.06em] ${className}`}>
-      <span className="text-emerald-700">Satguru</span>
-      <span className="text-orange-500">AI</span>
-    </span>
-  );
 }
 
 export default function Login() {
@@ -27,9 +20,7 @@ export default function Login() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const error = params.get('error');
-    if (error) {
-      setMessage(error);
-    }
+    if (error) setMessage(error);
   }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -86,7 +77,7 @@ export default function Login() {
                 <div className="absolute right-16 top-20 h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(16,185,129,0.75)]" />
                 <div className="absolute left-1/2 top-7 h-32 w-32 -translate-x-1/2 rounded-full border border-emerald-100 xl:h-36 xl:w-36" />
                 <div className="absolute inset-x-0 top-14 flex justify-center xl:top-16">
-                  <SatguruWordmark className="text-[clamp(2.5rem,4.5vw,4rem)]" />
+                  <SatguruLogo className="h-24 w-auto max-w-[360px] object-contain" />
                 </div>
               </div>
               <h1 className="text-[clamp(1.45rem,2vw,2rem)] font-black leading-tight text-slate-950">Welcome back to Satguru AI</h1>
@@ -97,7 +88,7 @@ export default function Login() {
           <div className="flex min-h-0 items-center justify-center p-4 sm:p-5 lg:p-5 xl:p-6">
             <div className="w-full max-w-[520px]">
               <div className="mb-2 text-center lg:hidden">
-                <SatguruWordmark className="text-4xl" />
+                <SatguruLogo className="mx-auto h-14 w-auto max-w-[220px] object-contain" />
                 <p className="mt-1 text-sm text-slate-600">Welcome back! Sign in to access your Satguru AI home.</p>
               </div>
 
@@ -106,11 +97,7 @@ export default function Login() {
                 Continue with Google
               </button>
 
-              <div className="my-3 flex items-center gap-4 text-sm text-slate-500">
-                <span className="h-px flex-1 bg-slate-200" />
-                or
-                <span className="h-px flex-1 bg-slate-200" />
-              </div>
+              <div className="my-3 flex items-center gap-4 text-sm text-slate-500"><span className="h-px flex-1 bg-slate-200" />or<span className="h-px flex-1 bg-slate-200" /></div>
 
               <form className="grid gap-2.5" onSubmit={handleSubmit}>
                 <label className="grid gap-1 text-sm font-extrabold text-slate-900">
@@ -131,33 +118,17 @@ export default function Login() {
                 </label>
 
                 <div className="flex items-center justify-between gap-3 text-sm">
-                  <label className="flex items-center gap-2 text-slate-700">
-                    <input className="h-4 w-4 rounded border-slate-300 text-emerald-700" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} type="checkbox" />
-                    Remember me
-                  </label>
+                  <label className="flex items-center gap-2 text-slate-700"><input className="h-4 w-4 rounded border-slate-300 text-emerald-700" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} type="checkbox" />Remember me</label>
                   <Link className="font-extrabold text-emerald-700 hover:underline" href="/forgot-password">Forgot password?</Link>
                 </div>
 
                 {message ? <p className="rounded-xl border border-amber-200 bg-amber-50 p-2 text-sm text-amber-800">{message}</p> : null}
-
                 <button className="rounded-xl bg-emerald-700 px-5 py-2.5 text-base font-black text-white shadow-lg shadow-emerald-700/20 hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-400" disabled={isSubmitting} type="submit">{isSubmitting ? 'Creating session...' : 'Login →'}</button>
               </form>
 
-              <div className="my-3 flex items-center gap-3 text-sm text-slate-700">
-                <span className="h-px flex-1 bg-slate-200" />
-                <span className="whitespace-nowrap font-medium">New here? Create your access</span>
-                <span className="h-px flex-1 bg-slate-200" />
-              </div>
-
-              <Link className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-extrabold text-slate-900 shadow-sm hover:border-emerald-500 hover:bg-emerald-50 xl:py-2.5" href="/signup">
-                <span className="text-lg text-emerald-700">✉</span>
-                Sign up with Email
-              </Link>
-
-              <a className="mt-3 flex items-center justify-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-2 text-center text-slate-900 hover:border-emerald-500 hover:bg-emerald-50 xl:py-2.5" href="mailto:admin@satguruai.com?subject=Satguru AI Portal Login Help">
-                <span className="text-xl text-emerald-700">☏</span>
-                <span><span className="block text-sm font-black">Need help? Contact administrator</span><span className="text-xs text-slate-600 xl:text-sm">We are here to help you with access or any queries.</span></span>
-              </a>
+              <div className="my-3 flex items-center gap-3 text-sm text-slate-700"><span className="h-px flex-1 bg-slate-200" /><span className="whitespace-nowrap font-medium">New here? Create your access</span><span className="h-px flex-1 bg-slate-200" /></div>
+              <Link className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-extrabold text-slate-900 shadow-sm hover:border-emerald-500 hover:bg-emerald-50 xl:py-2.5" href="/signup"><span className="text-lg text-emerald-700">✉</span>Sign up with Email</Link>
+              <a className="mt-3 flex items-center justify-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-2 text-center text-slate-900 hover:border-emerald-500 hover:bg-emerald-50 xl:py-2.5" href="mailto:admin@satguruai.com?subject=Satguru AI Portal Login Help"><span className="text-xl text-emerald-700">☏</span><span><span className="block text-sm font-black">Need help? Contact administrator</span><span className="text-xs text-slate-600 xl:text-sm">We are here to help you with access or any queries.</span></span></a>
             </div>
           </div>
         </div>
