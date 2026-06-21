@@ -8,6 +8,8 @@ import { SatguruLogo } from '@/components/BrandLogo';
 
 type HeaderUser = { name?: string; email?: string; role?: string };
 
+const authPages = ['/', '/login', '/signup', '/verify-otp', '/set-password', '/forgot-password', '/reset-password'];
+
 function initials(name?: string, email?: string) {
   const source = name || email || 'SA';
   return source.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join('');
@@ -41,7 +43,7 @@ export function Header({ user = null }: { user?: HeaderUser | null }) {
     return () => window.removeEventListener('satguru-sidebar-change', applySidebarState);
   }, []);
 
-  if (pathname === '/' || pathname === '/login') return null;
+  if (authPages.includes(pathname)) return null;
 
   return (
     <header className="fixed left-[var(--satguru-sidebar-width,220px)] right-0 top-0 z-50 h-[64px] border-b border-emerald-900/10 bg-gradient-to-r from-emerald-50/95 via-white/95 to-orange-50/95 shadow-sm shadow-slate-900/5 backdrop-blur-2xl transition-all duration-300 max-lg:left-0">
