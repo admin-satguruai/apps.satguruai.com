@@ -30,8 +30,23 @@ export function fallbackName(email: string) {
   return local.split(/[._-]+/).filter(Boolean).map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
 }
 
+function cleanEnv(value: string | undefined) {
+  return String(value || '').trim().replace(/^['"]|['"]$/g, '');
+}
+
+function cleanHost(value: string | undefined) {
+  const cleaned = cleanEnv(value)
+    .replace(/^https?:\/\//i, '')
+    .replace(/^smtp:\/\//i, '')
+    .split('/')[0]
+    .split(':')[0]
+    .trim();
+
+  return cleaned || 'smtp.gmail.com';
+}
+
 function authSecret() {
-  return process.env.AUTH_SECRET || process.env.SMTP_PASSWORD || process.env.EMAIL_PROVIDER_API_KEY || process.env.RESEND_API_KEY || 'development-secret-change-before-production';
+  return cleanEnv(process.env.AUTH_SECRET) || cleanEnv(process.env.SMTP_PASSWORD) || cleanEnv(process.env.EMAIL_PROVIDER_API_KEY) || cleanEnv(process.env.RESEND_API_KEY) || 'development-secret-change-before-production';
 }
 
 export function sign(value: string) {
@@ -83,16 +98,18 @@ export function hashPassword(password: string) {
 }
 
 function smtpConfig() {
-  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
-  const port = Number(process.env.SMTP_PORT || 465);
-  const secure = String(process.env.SMTP_SECURE || 'true').toLowerCase() !== 'false';
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASSWORD;
-  const from = process.env.EMAIL_FROM_ADDRESS || (user ? `Satguru AI <${user}>` : '');
+  const host = cleanHost(process.env.SMTP_HOST);
+  const portText = cleanEnv(process.env.SMTP_PORT) || '465';
+  const port = Number(portText);
+  const secure = cleanEnv(process.env.SMTP_SECURE || 'true').toLowerCase() !== 'false';
+  const user = cleanEnv(process.env.SMTP_USER);
+  const pass = cleanEnv(process.env.SMTP_PASSWORD);
+  const from = cleanEnv(process.env.EMAIL_FROM_ADDRESS) || (user ? `Satguru AI <${user}>` : '');
 
   if (!user) throw new Error('SMTP_USER is not configured. Add SMTP_USER in Vercel Environment Variables.');
   if (!pass) throw new Error('SMTP_PASSWORD is not configured. Add the Google App Password in Vercel Environment Variables.');
   if (!from) throw new Error('EMAIL_FROM_ADDRESS is not configured. Add EMAIL_FROM_ADDRESS in Vercel Environment Variables.');
+  if (!Number.isFinite(port)) throw new Error('SMTP_PORT is invalid. Use 465 for Gmail SSL SMTP.');
 
   return { host, port, secure, user, pass, from };
 }
@@ -103,9 +120,13 @@ export async function sendEmail(to: string, subject: string, text: string) {
     host: config.host,
     port: config.port,
     secure: config.secure,
+    requireTLS: !config.secure,
     auth: {
       user: config.user,
       pass: config.pass
+    },
+    tls: {
+      servername: config.host
     }
   });
 
