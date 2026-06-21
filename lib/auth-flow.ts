@@ -1,4 +1,5 @@
 import { createHmac, randomBytes, randomInt, timingSafeEqual, pbkdf2Sync } from 'crypto';
+import nodemailer from 'nodemailer';
 
 export const ALLOWED_DOMAINS = ['satgurutravel.com', 'satguruai.com'];
 export const TOKEN_TTL_MS = 10 * 60 * 1000;
@@ -30,7 +31,7 @@ export function fallbackName(email: string) {
 }
 
 function authSecret() {
-  return process.env.AUTH_SECRET || process.env.EMAIL_PROVIDER_API_KEY || process.env.RESEND_API_KEY || 'development-secret-change-before-production';
+  return process.env.AUTH_SECRET || process.env.SMTP_PASSWORD || process.env.EMAIL_PROVIDER_API_KEY || process.env.RESEND_API_KEY || 'development-secret-change-before-production';
 }
 
 export function sign(value: string) {
@@ -81,17 +82,37 @@ export function hashPassword(password: string) {
   return `pbkdf2_sha256$120000$${salt}$${hash}`;
 }
 
-export async function sendEmail(to: string, subject: string, text: string) {
-  const apiKey = process.env.EMAIL_PROVIDER_API_KEY || process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM_ADDRESS || process.env.RESEND_FROM_EMAIL;
-  if (!apiKey) throw new Error('Email provider is not configured. Add EMAIL_PROVIDER_API_KEY or RESEND_API_KEY in Vercel Environment Variables.');
-  if (!from) throw new Error('Sender email is not configured. Add EMAIL_FROM_ADDRESS or RESEND_FROM_EMAIL in Vercel Environment Variables.');
+function smtpConfig() {
+  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const port = Number(process.env.SMTP_PORT || 465);
+  const secure = String(process.env.SMTP_SECURE || 'true').toLowerCase() !== 'false';
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASSWORD;
+  const from = process.env.EMAIL_FROM_ADDRESS || (user ? `Satguru AI <${user}>` : '');
 
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from, to: [to], subject, text })
+  if (!user) throw new Error('SMTP_USER is not configured. Add SMTP_USER in Vercel Environment Variables.');
+  if (!pass) throw new Error('SMTP_PASSWORD is not configured. Add the Google App Password in Vercel Environment Variables.');
+  if (!from) throw new Error('EMAIL_FROM_ADDRESS is not configured. Add EMAIL_FROM_ADDRESS in Vercel Environment Variables.');
+
+  return { host, port, secure, user, pass, from };
+}
+
+export async function sendEmail(to: string, subject: string, text: string) {
+  const config = smtpConfig();
+  const transporter = nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
+    auth: {
+      user: config.user,
+      pass: config.pass
+    }
   });
 
-  if (!response.ok) throw new Error(`Email could not be sent. Provider response: ${await response.text()}`);
+  await transporter.sendMail({
+    from: config.from,
+    to,
+    subject,
+    text
+  });
 }
