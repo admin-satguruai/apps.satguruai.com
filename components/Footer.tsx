@@ -2,10 +2,12 @@
 
 import { usePathname } from 'next/navigation';
 
+const authPages = ['/', '/login', '/signup', '/verify-otp', '/set-password', '/forgot-password', '/reset-password'];
+
 export function Footer() {
   const pathname = usePathname();
 
-  if (pathname === '/' || pathname === '/login') {
+  if (authPages.includes(pathname)) {
     return null;
   }
 
