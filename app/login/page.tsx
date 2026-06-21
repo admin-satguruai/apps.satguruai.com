@@ -5,7 +5,7 @@ import { FormEvent, useEffect, useState } from 'react';
 
 import { SatguruLogo } from '@/components/BrandLogo';
 
-const allowedDomains = ['satgurutravel.com', 'satguruai.com'];
+const allowedDomains = ['satgurutravel.com', 'satguruai.com', 'satguruuniverse.com'];
 
 function isAllowedEmail(email: string) {
   return allowedDomains.some((domain) => email.endsWith(`@${domain}`));
@@ -13,14 +13,6 @@ function isAllowedEmail(email: string) {
 
 function MailIcon() {
   return <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><path d="M4.5 6.5h15v11h-15z" rx="2" /><path d="m5 7 7 5.5L19 7" strokeLinecap="round" strokeLinejoin="round" /></svg>;
-}
-
-function LockIcon() {
-  return <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><path d="M7 10V8a5 5 0 0 1 10 0v2" strokeLinecap="round" /><rect x="5" y="10" width="14" height="10" rx="2" /><path d="M12 14v2" strokeLinecap="round" /></svg>;
-}
-
-function EyeIcon() {
-  return <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" strokeLinecap="round" strokeLinejoin="round" /><circle cx="12" cy="12" r="2.5" /></svg>;
 }
 
 function UserPlusIcon() {
@@ -37,8 +29,6 @@ function Spinner() {
 
 export default function Login() {
   const [message, setMessage] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -67,14 +57,16 @@ export default function Login() {
       body: JSON.stringify({ email })
     });
 
+    const result = await response.json().catch(() => ({ message: 'Unable to send verification code.' }));
+
     if (!response.ok) {
-      const result = await response.json().catch(() => ({ message: 'Unable to create login session.' }));
-      setMessage(result.message || 'Unable to create login session.');
+      setMessage(result.message || 'Unable to send verification code.');
       setIsSubmitting(false);
       return;
     }
 
-    window.location.href = '/dashboard';
+    sessionStorage.setItem('satguru_verification_token', result.verificationToken);
+    window.location.href = result.redirectTo || `/verify-otp?email=${encodeURIComponent(email)}`;
   }
 
   function startGoogleLogin() {
@@ -82,13 +74,13 @@ export default function Login() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-slate-50 px-3 py-3 sm:px-4">
+    <div className="relative min-h-screen overflow-hidden bg-slate-50 px-3 py-3 sm:px-4">
       {isSubmitting ? (
         <div className="fixed inset-0 z-50 grid place-items-center bg-white/80 backdrop-blur-md">
           <div className="flex w-[min(92vw,360px)] flex-col items-center rounded-3xl border border-emerald-100 bg-white p-8 text-center shadow-2xl shadow-slate-900/15">
             <Spinner />
-            <p className="mt-5 text-lg font-black text-slate-950">Signing you in</p>
-            <p className="mt-2 text-sm leading-6 text-slate-500">Please wait while we verify your access and open your workspace.</p>
+            <p className="mt-5 text-lg font-black text-slate-950">Sending verification code</p>
+            <p className="mt-2 text-sm leading-6 text-slate-500">Please check your official email to complete login.</p>
           </div>
         </div>
       ) : null}
@@ -141,22 +133,10 @@ export default function Login() {
                   </div>
                 </label>
 
-                <label className="grid gap-1 text-sm font-extrabold text-slate-900">
-                  Password
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600"><LockIcon /></span>
-                    <input className="w-full rounded-xl border border-slate-300 bg-white/90 py-2 pl-11 pr-14 text-base font-semibold text-slate-900 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" name="password" type={showPassword ? 'text' : 'password'} placeholder="Password" required />
-                    <button className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-500 hover:bg-slate-100 hover:text-emerald-700" onClick={() => setShowPassword((value) => !value)} type="button" aria-label="Toggle password visibility"><EyeIcon /></button>
-                  </div>
-                </label>
-
-                <div className="flex items-center justify-between gap-3 text-sm">
-                  <label className="flex items-center gap-2 text-slate-600"><input className="h-4 w-4 rounded border-slate-300 text-emerald-700" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} type="checkbox" />Remember me</label>
-                  <Link className="font-extrabold text-emerald-700 hover:underline" href="/forgot-password">Forgot password?</Link>
-                </div>
+                <p className="rounded-xl border border-emerald-100 bg-emerald-50/70 p-3 text-sm leading-6 text-emerald-900">Enter your official email. We will send a one-time verification code before opening your workspace.</p>
 
                 {message ? <p className="rounded-xl border border-amber-200 bg-amber-50 p-2 text-sm text-amber-800">{message}</p> : null}
-                <button className="rounded-xl bg-emerald-700 px-5 py-2.5 text-base font-black text-white shadow-lg shadow-emerald-700/20 hover:bg-emerald-800 disabled:cursor-wait disabled:bg-emerald-700" disabled={isSubmitting} type="submit">Login</button>
+                <button className="rounded-xl bg-emerald-700 px-5 py-2.5 text-base font-black text-white shadow-lg shadow-emerald-700/20 hover:bg-emerald-800 disabled:cursor-wait disabled:bg-emerald-700" disabled={isSubmitting} type="submit">Send verification code</button>
               </form>
 
               <div className="my-3 flex items-center gap-3 text-sm text-slate-600"><span className="h-px flex-1 bg-slate-200" /><span className="whitespace-nowrap font-medium">New here? Create your access</span><span className="h-px flex-1 bg-slate-200" /></div>
@@ -166,6 +146,6 @@ export default function Login() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }
