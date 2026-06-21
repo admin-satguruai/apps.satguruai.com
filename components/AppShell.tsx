@@ -1,16 +1,17 @@
 import Link from 'next/link';
+import { AppNavLink } from '@/components/AppNavLink';
 import { getSessionUser } from '@/lib/auth';
 
 const adminLinks = [
-  'users',
-  'countries',
-  'portals',
-  'domains',
-  'categories',
-  'documents',
-  'announcements',
-  'support',
-  'settings',
+  { key: 'users', label: 'Users', icon: 'users' as const },
+  { key: 'countries', label: 'Countries', icon: 'countries' as const },
+  { key: 'portals', label: 'Portals', icon: 'portals' as const },
+  { key: 'domains', label: 'Domains', icon: 'domains' as const },
+  { key: 'categories', label: 'Categories', icon: 'categories' as const },
+  { key: 'documents', label: 'Documents', icon: 'documents' as const },
+  { key: 'announcements', label: 'Announcements', icon: 'announcements' as const },
+  { key: 'support', label: 'Support', icon: 'support' as const },
+  { key: 'settings', label: 'Settings', icon: 'settings' as const }
 ];
 
 function initials(name?: string, email?: string) {
@@ -21,14 +22,6 @@ function initials(name?: string, email?: string) {
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
     .join('');
-}
-
-function navLabel(link: string) {
-  return link[0].toUpperCase() + link.slice(1);
-}
-
-function baseLinkClass(isPrimary = false) {
-  return `flex h-11 items-center rounded-xl px-4 text-sm font-black transition ${isPrimary ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100' : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'}`;
 }
 
 function SessionCard() {
@@ -69,19 +62,19 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     <div className="w-full bg-slate-50">
       <div className="mx-auto flex w-full max-w-[1600px] gap-6 px-4 py-6 sm:px-6 lg:px-8">
         <aside className="hidden w-[280px] shrink-0 lg:block">
-          <div className="sticky top-[96px] flex max-h-[calc(100vh-112px)] flex-col rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_4px_20px_rgba(15,23,42,0.06)]">
+          <div className="sticky top-[96px] flex max-h-[calc(100vh-112px)] flex-col overflow-y-auto rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_4px_20px_rgba(15,23,42,0.06)]">
             <nav className="grid gap-2">
-              <Link className={baseLinkClass(true)} href="/dashboard">Dashboard</Link>
-              <Link className={baseLinkClass()} href="/portals">Portal directory</Link>
-              <Link className={baseLinkClass()} href="/favorites">Favorites</Link>
-              <Link className={baseLinkClass()} href="/profile">Profile</Link>
-              <Link className={baseLinkClass()} href="/support">Support</Link>
+              <AppNavLink href="/dashboard" label="Dashboard" icon="dashboard" />
+              <AppNavLink href="/portals" label="Portal directory" icon="directory" />
+              <AppNavLink href="/favorites" label="Favorites" icon="favorite" />
+              <AppNavLink href="/profile" label="Profile" icon="profile" />
+              <AppNavLink href="/support" label="Support" icon="support" />
             </nav>
             <div className="mt-5 border-t border-slate-100 pt-4">
               <p className="mb-2 px-4 text-xs font-black uppercase tracking-wide text-slate-400">Admin</p>
               <nav className="grid gap-2">
-                <Link className={baseLinkClass()} href="/admin">Admin console</Link>
-                <Link className={baseLinkClass()} href="/admin/countries">Country Master</Link>
+                <AppNavLink href="/admin" label="Admin console" icon="overview" />
+                <AppNavLink href="/admin/countries" label="Country Master" icon="countries" />
               </nav>
             </div>
             <SessionCard />
@@ -104,11 +97,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <h2 className="mt-1 text-xl font-black text-slate-950">Admin console</h2>
             </div>
             <nav className="grid gap-2">
-              <Link className={baseLinkClass()} href="/admin">Overview</Link>
+              <AppNavLink href="/admin" label="Overview" icon="overview" />
               {adminLinks.map((link) => (
-                <Link className={baseLinkClass(link === 'countries')} key={link} href={`/admin/${link}`}>
-                  {navLabel(link)}
-                </Link>
+                <AppNavLink key={link.key} href={`/admin/${link.key}`} label={link.label} icon={link.icon} />
               ))}
             </nav>
             <p className="mt-6 rounded-2xl bg-slate-50 p-4 text-xs font-medium leading-5 text-slate-500">Admin access is controlled by the active session role.</p>
