@@ -3,24 +3,33 @@ import { NextResponse } from 'next/server';
 import { getPortalUserByEmail } from '@/lib/supabase-admin';
 import { ALLOWED_DOMAINS, TOKEN_TTL_MS, encodeToken, isAllowedEmail, makeOtp, normalizeEmail, sendEmail } from '@/lib/auth-flow';
 
+function safeSmtpDetail(error: unknown) {
+  const raw = error instanceof Error ? error.message : String(error || 'Unknown SMTP error');
+  return raw
+    .replace(/\b[A-Za-z0-9+/=]{12,}\b/g, '[hidden]')
+    .replace(/\b[A-Fa-f0-9]{16,}\b/g, '[hidden]')
+    .slice(0, 360);
+}
+
 function smtpFailureMessage(error: unknown) {
   const reason = error instanceof Error ? error.message : '';
   const lowerReason = reason.toLowerCase();
+  const detail = safeSmtpDetail(error);
 
   if (lowerReason.includes('configured')) {
-    return 'OTP email service is not configured yet. Please configure SMTP_USER, SMTP_PASSWORD, EMAIL_FROM_ADDRESS, AUTH_SECRET, and NEXT_PUBLIC_APP_URL in Vercel environment variables.';
+    return `OTP email service is not configured yet. Please configure SMTP_USER, SMTP_PASSWORD, EMAIL_FROM_ADDRESS, AUTH_SECRET, and NEXT_PUBLIC_APP_URL in Vercel environment variables. Diagnostic: ${detail}`;
   }
 
   if (lowerReason.includes('invalid login') || lowerReason.includes('username and password not accepted') || lowerReason.includes('535')) {
-    return 'OTP email could not be sent because Google rejected the SMTP login. Please regenerate a Google App Password from noreply@satguruai.com and update SMTP_PASSWORD in Vercel. Do not use the normal mailbox password.';
+    return `Google rejected the SMTP login. Please regenerate a Google App Password from noreply@satguruai.com and update SMTP_PASSWORD in Vercel. Do not use the normal mailbox password. Diagnostic: ${detail}`;
   }
 
   if (lowerReason.includes('connection') || lowerReason.includes('timeout') || lowerReason.includes('etimedout') || lowerReason.includes('econn')) {
-    return 'OTP email could not be sent because the SMTP connection failed. Please check SMTP_HOST=smtp.gmail.com, SMTP_PORT=465, and SMTP_SECURE=true in Vercel, then redeploy.';
+    return `SMTP connection failed. Please check SMTP_HOST=smtp.gmail.com, SMTP_PORT=465, and SMTP_SECURE=true in Vercel, then redeploy. Diagnostic: ${detail}`;
   }
 
   console.error('Signup OTP email failure:', reason);
-  return 'Unable to send OTP email right now. Please check Vercel Function Logs for the exact SMTP error and verify the Google App Password for noreply@satguruai.com.';
+  return `Unable to send OTP email right now. SMTP diagnostic: ${detail}`;
 }
 
 export async function POST(request: Request) {
