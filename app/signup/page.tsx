@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -23,19 +24,23 @@ export default function Signup() {
     const email = String(form.get('email') ?? '').trim().toLowerCase();
 
     if (!isAllowedEmail(email)) {
-      setMessage('Self signup is allowed only with an approved official domain.');
+      setMessage('Self signup is allowed only with an approved official domain. Please contact administrator if your domain is not registered.');
       setIsSubmitting(false);
       return;
     }
 
-    const controller = new AbortController();
-    const timeoutId = window.setTimeout(() => controller.abort(), 15000);
+    const requiredFields = ['fullName', 'email', 'department', 'branch', 'country'];
+    const missing = requiredFields.some((field) => !String(form.get(field) ?? '').trim());
+    if (missing) {
+      setMessage('Full name, email, department, branch, and country are mandatory. Mobile number is optional.');
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
         body: JSON.stringify({
           fullName: String(form.get('fullName') ?? '').trim(),
           email,
@@ -47,7 +52,6 @@ export default function Signup() {
       });
 
       const data = await response.json().catch(() => ({ message: 'Unable to read server response.' }));
-
       if (!response.ok) {
         setMessage(data.message ?? 'Unable to send OTP. Please try again.');
         return;
@@ -55,39 +59,43 @@ export default function Signup() {
 
       sessionStorage.setItem('satguru_verification_token', data.verificationToken);
       router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
-    } catch (error) {
-      setMessage(
-        error instanceof DOMException && error.name === 'AbortError'
-          ? 'OTP request timed out. Please check email provider settings and try again.'
-          : 'Unable to send OTP. Please try again.'
-      );
+    } catch {
+      setMessage('Unable to send OTP. Please try again.');
     } finally {
-      window.clearTimeout(timeoutId);
       setIsSubmitting(false);
     }
   }
 
   return (
-    <section className="mx-auto max-w-3xl px-4 py-16">
-      <form className="card grid gap-4" onSubmit={handleSubmit}>
-        <h1 className="text-3xl font-black text-navy">Self signup</h1>
-        <p className="text-sm text-slate-600">
-          Signup is restricted to approved official domains: <strong>satgurutravel.com</strong> and <strong>satguruai.com</strong>.
-          After submitting, the system will send an OTP to your email.
-        </p>
-        <div className="grid gap-4 md:grid-cols-2">
-          <input className="input" name="fullName" placeholder="Full name" required />
-          <input className="input" name="email" type="email" placeholder="Official company email" required />
-          <input className="input" name="mobile" placeholder="Mobile" />
-          <input className="input" name="department" placeholder="Department" />
-          <input className="input" name="branch" placeholder="Branch" />
-          <input className="input" name="country" placeholder="Country" />
-        </div>
-        {message ? <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-700">{message}</p> : null}
-        <button className="btn-primary disabled:cursor-not-allowed disabled:opacity-70" disabled={isSubmitting} type="submit">
-          {isSubmitting ? 'Sending OTP...' : 'Generate and send OTP'}
-        </button>
-      </form>
-    </section>
+    <main className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-orange-50 px-4 py-10">
+      <section className="mx-auto max-w-4xl rounded-3xl border border-white/80 bg-white/95 p-6 shadow-2xl shadow-slate-900/10">
+        <form className="grid gap-4" onSubmit={handleSubmit}>
+          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+            <div>
+              <h1 className="text-3xl font-black text-slate-950">Self signup</h1>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+                Signup is restricted to approved official domains: <strong>satgurutravel.com</strong> and <strong>satguruai.com</strong>. After submitting, an OTP will be sent to your email.
+              </p>
+            </div>
+            <Link className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-700 hover:border-emerald-300" href="mailto:admin@satguruai.com?subject=Satguru AI Signup Help">Need help?</Link>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <input className="input" name="fullName" placeholder="Full name *" required />
+            <input className="input" name="email" type="email" placeholder="Official company email *" required />
+            <input className="input" name="mobile" placeholder="Mobile number optional" />
+            <input className="input" name="department" placeholder="Department *" required />
+            <input className="input" name="branch" placeholder="Branch *" required />
+            <input className="input" name="country" placeholder="Country *" required />
+          </div>
+
+          {message ? <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-700">{message}</p> : null}
+          <button className="btn-primary disabled:cursor-wait disabled:opacity-70" disabled={isSubmitting} type="submit">
+            {isSubmitting ? 'Sending OTP...' : 'Generate and send OTP'}
+          </button>
+          <p className="text-center text-sm text-slate-500">Already registered? <Link className="font-bold text-emerald-700" href="/login">Back to login</Link></p>
+        </form>
+      </section>
+    </main>
   );
 }
