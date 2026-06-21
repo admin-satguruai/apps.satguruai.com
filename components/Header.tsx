@@ -23,7 +23,7 @@ function displayRole(role?: string) {
   return role ? role.replace('_', ' ') : 'workspace';
 }
 
-export function Header({ user }: { user: HeaderUser | null }) {
+export function Header({ user = null }: { user?: HeaderUser | null }) {
   const pathname = usePathname();
 
   if (pathname === '/' || pathname === '/login') {
@@ -55,7 +55,7 @@ export function Header({ user }: { user: HeaderUser | null }) {
           <Link href="/profile" className="flex max-w-[260px] items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition hover:bg-emerald-50">
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-950 text-xs font-black text-orange-400">{initials(user?.name, user?.email)}</span>
             <span className="hidden min-w-0 text-left md:block">
-              <span className="block truncate text-sm font-black leading-4 text-slate-950">{user?.name || 'Satguru User'}</span>
+              <span className="block truncate text-sm font-black leading-4 text-slate-950">{user?.name || 'Satguru Workspace'}</span>
               <span className="block truncate text-xs font-semibold capitalize text-slate-500">{displayRole(user?.role)}</span>
             </span>
           </Link>
