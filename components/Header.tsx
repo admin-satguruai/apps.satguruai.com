@@ -26,11 +26,8 @@ function displayRole(role?: string) {
 
 function HeaderLogo() {
   return (
-    <Link href="/dashboard" className="flex shrink-0 items-center rounded-2xl px-2 py-1 transition hover:bg-white/80" aria-label="Go to dashboard">
-      <span className="text-[28px] font-black leading-none tracking-[-0.06em] sm:text-[30px]">
-        <span className="text-emerald-700">Satguru</span>
-        <span className="text-orange-500">AI</span>
-      </span>
+    <Link href="/dashboard" className="flex h-12 w-[178px] shrink-0 items-center rounded-2xl px-1 transition hover:bg-white/80" aria-label="Go to dashboard">
+      <img src="/logos/satguru-ai-logo.svg" alt="SatguruAI" className="h-11 w-auto object-contain" />
     </Link>
   );
 }
