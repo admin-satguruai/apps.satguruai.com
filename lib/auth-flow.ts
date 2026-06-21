@@ -1,15 +1,32 @@
 import { createHmac, randomBytes, randomInt, timingSafeEqual, pbkdf2Sync } from 'crypto';
 
-export const ALLOWED_DOMAINS = ['satgurutravel.com', 'satguruai.com'];
+export const ALLOWED_DOMAINS = ['satgurutravel.com', 'satguruai.com', 'satguruuniverse.com'];
 export const TOKEN_TTL_MS = 10 * 60 * 1000;
 export const RESET_TTL_MS = 30 * 60 * 1000;
+export const SESSION_TTL_MS = 24 * 60 * 60 * 1000;
 
 export const cookieOptions = {
   httpOnly: true,
   sameSite: 'lax' as const,
   secure: process.env.NODE_ENV === 'production',
-  maxAge: 24 * 60 * 60,
+  maxAge: Math.floor(SESSION_TTL_MS / 1000),
   path: '/'
+};
+
+export type SessionRole = 'user' | 'portal_owner' | 'support' | 'admin' | 'super_admin';
+
+export type SessionTokenPayload = {
+  purpose: 'session';
+  email: string;
+  name: string;
+  role: SessionRole;
+  picture?: string;
+  loginMethod: string;
+  lastLogin: string;
+  department?: string;
+  branch?: string;
+  country?: string;
+  exp?: number;
 };
 
 export function isAllowedEmail(email: string) {
@@ -30,7 +47,13 @@ export function fallbackName(email: string) {
 }
 
 function authSecret() {
-  return process.env.AUTH_SECRET || process.env.EMAIL_PROVIDER_API_KEY || process.env.RESEND_API_KEY || 'development-secret-change-before-production';
+  const secret = process.env.AUTH_SECRET || process.env.EMAIL_PROVIDER_API_KEY || process.env.RESEND_API_KEY;
+
+  if (!secret && process.env.NODE_ENV === 'production') {
+    throw new Error('AUTH_SECRET is required in production. Add it in Vercel Environment Variables.');
+  }
+
+  return secret || 'development-secret-change-before-production';
 }
 
 export function sign(value: string) {
@@ -59,6 +82,36 @@ export function decodeToken(token: string) {
   } catch {
     return null;
   }
+}
+
+export function createSessionToken(payload: Omit<SessionTokenPayload, 'purpose' | 'exp'>) {
+  return encodeToken({ ...payload, purpose: 'session' }, SESSION_TTL_MS);
+}
+
+export function decodeSessionToken(token: string): SessionTokenPayload | null {
+  const payload = decodeToken(token);
+  if (!payload || payload.purpose !== 'session') return null;
+
+  const email = normalizeEmail(payload.email);
+  const role = String(payload.role || 'user') as SessionRole;
+  const name = String(payload.name || fallbackName(email));
+
+  if (!email || !isAllowedEmail(email)) return null;
+  if (!['user', 'portal_owner', 'support', 'admin', 'super_admin'].includes(role)) return null;
+
+  return {
+    purpose: 'session',
+    email,
+    name,
+    role,
+    picture: typeof payload.picture === 'string' ? payload.picture : undefined,
+    loginMethod: String(payload.loginMethod || 'email'),
+    lastLogin: String(payload.lastLogin || new Date().toISOString()),
+    department: typeof payload.department === 'string' ? payload.department : undefined,
+    branch: typeof payload.branch === 'string' ? payload.branch : undefined,
+    country: typeof payload.country === 'string' ? payload.country : undefined,
+    exp: Number(payload.exp || 0)
+  };
 }
 
 export function makeOtp() {
