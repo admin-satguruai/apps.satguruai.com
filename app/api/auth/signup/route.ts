@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     } catch (emailError) {
       const reason = emailError instanceof Error ? emailError.message : '';
       if (reason.toLowerCase().includes('configured')) {
-        return NextResponse.json({ message: 'OTP email service is not configured yet. Please ask the administrator to configure RESEND_API_KEY and RESEND_FROM_EMAIL in Vercel environment variables.' }, { status: 503 });
+        return NextResponse.json({ message: 'OTP email service is not configured yet. Please ask the administrator to configure SMTP_USER, SMTP_PASSWORD, EMAIL_FROM_ADDRESS, AUTH_SECRET, and NEXT_PUBLIC_APP_URL in Vercel environment variables.' }, { status: 503 });
       }
       return NextResponse.json({ message: 'Unable to send OTP email right now. Please try again later or contact administrator.' }, { status: 502 });
     }
