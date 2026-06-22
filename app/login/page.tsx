@@ -75,7 +75,7 @@ export default function Login() {
     const response = await fetch('/api/auth/email-login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
+      body: JSON.stringify({ email, rememberMe })
     });
 
     if (!response.ok) {
@@ -114,8 +114,6 @@ export default function Login() {
           <aside className="hidden border-r border-slate-200/80 bg-gradient-to-br from-white/45 via-emerald-50/35 to-sky-50/30 p-8 lg:flex lg:flex-col lg:items-center lg:justify-center">
             <div className="mx-auto flex w-full max-w-sm flex-col items-center text-center">
               <div className="relative grid w-full place-items-center rounded-[2rem] border border-emerald-100/70 bg-white/35 px-7 py-8 shadow-inner shadow-white/60 backdrop-blur-sm">
-                <div className="absolute -left-2 top-5 h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(16,185,129,0.65)]" />
-                <div className="absolute -right-2 top-1/2 h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(16,185,129,0.65)]" />
                 <div className="absolute inset-x-8 bottom-5 h-px bg-gradient-to-r from-transparent via-emerald-200 to-transparent" />
                 <SatguruLogo className="relative h-16 w-auto max-w-[300px] object-contain mix-blend-multiply" />
               </div>
@@ -143,7 +141,7 @@ export default function Login() {
                   Email ID
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600"><MailIcon /></span>
-                    <input className="w-full rounded-xl border border-slate-300 bg-white/90 py-2.5 pl-11 pr-4 text-[15px] font-semibold text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" name="email" type="email" placeholder="you@company.com" required />
+                    <input className="w-full rounded-xl border border-slate-300 bg-white/90 py-2.5 pl-11 pr-4 text-[15px] font-medium text-slate-900 outline-none transition placeholder:font-normal placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" name="email" type="email" placeholder="you@company.com" required />
                   </div>
                 </label>
 
@@ -151,14 +149,14 @@ export default function Login() {
                   Password
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600"><LockIcon /></span>
-                    <input className="w-full rounded-xl border border-slate-300 bg-white/90 py-2.5 pl-11 pr-14 text-[15px] font-semibold text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" name="password" type={showPassword ? 'text' : 'password'} placeholder="Password" required />
+                    <input className="w-full rounded-xl border border-slate-300 bg-white/90 py-2.5 pl-11 pr-14 text-[15px] font-medium text-slate-900 outline-none transition placeholder:font-normal placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" name="password" type={showPassword ? 'text' : 'password'} placeholder="Password" required />
                     <button className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-500 hover:bg-slate-100 hover:text-emerald-700" onClick={() => setShowPassword((value) => !value)} type="button" aria-label="Toggle password visibility"><EyeIcon /></button>
                   </div>
                 </label>
 
-                <div className="flex items-center justify-between gap-3 text-sm">
-                  <label className="flex items-center gap-2 text-slate-600"><input className="h-4 w-4 rounded border-slate-300 text-emerald-700" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} type="checkbox" />Remember me</label>
-                  <Link className="font-bold text-emerald-700 hover:underline" href="/forgot-password">Forgot password?</Link>
+                <div className="flex items-center justify-between gap-3 text-[12px]">
+                  <label className="flex items-center gap-2 font-medium text-slate-500"><input className="h-3.5 w-3.5 rounded border-slate-300 text-emerald-700" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} type="checkbox" />Remember me</label>
+                  <Link className="font-semibold text-emerald-700 hover:underline" href="/forgot-password">Forgot password?</Link>
                 </div>
 
                 {message ? <p className="rounded-xl border border-amber-200 bg-amber-50 p-2 text-sm text-amber-800">{message}</p> : null}
