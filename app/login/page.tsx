@@ -6,6 +6,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { SatguruLogo } from '@/components/BrandLogo';
 
 const allowedDomains = ['satgurutravel.com', 'satguruai.com'];
+const rememberedEmailKey = 'satguruai_remembered_email';
 
 function isAllowedEmail(email: string) {
   return allowedDomains.some((domain) => email.endsWith(`@${domain}`));
@@ -48,6 +49,7 @@ function Spinner() {
 
 export default function Login() {
   const [message, setMessage] = useState('');
+  const [emailValue, setEmailValue] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -56,6 +58,12 @@ export default function Login() {
     const params = new URLSearchParams(window.location.search);
     const error = params.get('error');
     if (error) setMessage(error);
+
+    const savedEmail = window.localStorage.getItem(rememberedEmailKey) || '';
+    if (savedEmail) {
+      setEmailValue(savedEmail);
+      setRememberMe(true);
+    }
   }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -70,6 +78,12 @@ export default function Login() {
       setMessage('Only approved Satguru domains can access this portal.');
       setIsSubmitting(false);
       return;
+    }
+
+    if (rememberMe) {
+      window.localStorage.setItem(rememberedEmailKey, email);
+    } else {
+      window.localStorage.removeItem(rememberedEmailKey);
     }
 
     const response = await fetch('/api/auth/email-login', {
@@ -141,7 +155,7 @@ export default function Login() {
                   Email ID
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600"><MailIcon /></span>
-                    <input className="w-full rounded-xl border border-slate-300 bg-white/90 py-2.5 pl-11 pr-4 text-[15px] font-medium text-slate-900 outline-none transition placeholder:font-normal placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" name="email" type="email" placeholder="you@company.com" required />
+                    <input className="w-full rounded-xl border border-slate-300 bg-white/90 py-2.5 pl-11 pr-4 text-[15px] font-medium text-slate-900 outline-none transition placeholder:font-normal placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100" name="email" type="email" value={emailValue} onChange={(event) => setEmailValue(event.target.value)} placeholder="you@company.com" required />
                   </div>
                 </label>
 
