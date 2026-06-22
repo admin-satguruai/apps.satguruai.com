@@ -4,6 +4,7 @@ import nodemailer from 'nodemailer';
 export const ALLOWED_DOMAINS = ['satgurutravel.com', 'satguruai.com'];
 export const TOKEN_TTL_MS = 10 * 60 * 1000;
 export const RESET_TTL_MS = 30 * 60 * 1000;
+export const SESSION_TTL_MS = 24 * 60 * 60 * 1000;
 
 export const cookieOptions = {
   httpOnly: true,
@@ -11,6 +12,16 @@ export const cookieOptions = {
   secure: process.env.NODE_ENV === 'production',
   maxAge: 24 * 60 * 60,
   path: '/'
+};
+
+export type SessionPayload = {
+  email: string;
+  name: string;
+  role: 'user' | 'admin' | 'super_admin';
+  status?: string;
+  picture?: string;
+  loginMethod: string;
+  lastLogin: string;
 };
 
 export function isAllowedEmail(email: string) {
@@ -46,7 +57,11 @@ function cleanHost(value: string | undefined) {
 }
 
 function authSecret() {
-  return cleanEnv(process.env.AUTH_SECRET) || cleanEnv(process.env.SMTP_PASSWORD) || cleanEnv(process.env.EMAIL_PROVIDER_API_KEY) || cleanEnv(process.env.RESEND_API_KEY) || 'development-secret-change-before-production';
+  const configured = cleanEnv(process.env.AUTH_SECRET);
+  if (!configured && process.env.NODE_ENV === 'production') {
+    throw new Error('AUTH_SECRET is required in production.');
+  }
+  return configured || 'development-secret-change-before-production';
 }
 
 export function sign(value: string) {
@@ -77,6 +92,30 @@ export function decodeToken(token: string) {
   }
 }
 
+function normalizeRole(role: unknown): SessionPayload['role'] {
+  return role === 'super_admin' || role === 'admin' ? role : 'user';
+}
+
+export function createSessionToken(payload: SessionPayload) {
+  return encodeToken({ purpose: 'session', ...payload, role: normalizeRole(payload.role) }, SESSION_TTL_MS);
+}
+
+export function decodeSessionToken(token: string): SessionPayload | null {
+  const payload = decodeToken(token);
+  if (!payload || payload.purpose !== 'session') return null;
+  const email = normalizeEmail(payload.email);
+  if (!email || !isAllowedEmail(email)) return null;
+  return {
+    email,
+    name: String(payload.name || fallbackName(email)),
+    role: normalizeRole(payload.role),
+    status: String(payload.status || 'active'),
+    picture: payload.picture ? String(payload.picture) : undefined,
+    loginMethod: String(payload.loginMethod || 'unknown'),
+    lastLogin: String(payload.lastLogin || new Date().toISOString())
+  };
+}
+
 export function makeOtp() {
   return String(randomInt(100000, 1000000));
 }
@@ -95,6 +134,17 @@ export function hashPassword(password: string) {
   const salt = randomBytes(16).toString('hex');
   const hash = pbkdf2Sync(password, salt, 120000, 32, 'sha256').toString('hex');
   return `pbkdf2_sha256$120000$${salt}$${hash}`;
+}
+
+export function verifyPassword(password: string, storedHash?: string | null) {
+  const parts = String(storedHash || '').split('$');
+  if (parts.length !== 4 || parts[0] !== 'pbkdf2_sha256') return false;
+  const iterations = Number(parts[1]);
+  const salt = parts[2];
+  const expected = parts[3];
+  if (!Number.isFinite(iterations) || !salt || !expected) return false;
+  const actual = pbkdf2Sync(password, salt, iterations, 32, 'sha256').toString('hex');
+  return safeEqual(actual, expected);
 }
 
 function smtpConfig() {
