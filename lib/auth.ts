@@ -9,6 +9,14 @@ function readCookie(name: string) {
   return cookies().get(name)?.value;
 }
 
+function normalizeStatus(status?: string): User['status'] {
+  if (status === 'pending' || status === 'inactive') {
+    return status;
+  }
+
+  return 'active';
+}
+
 export function getEffectiveRole(email: string, role?: string) {
   if (email.toLowerCase() === PRIMARY_SUPER_ADMIN_EMAIL) {
     return 'super_admin' as const;
@@ -34,7 +42,7 @@ export function getSessionUser(): SessionUser | null {
     department: 'To be updated',
     branch: 'To be updated',
     country: 'To be updated',
-    status: session.status || 'active',
+    status: normalizeStatus(session.status),
     lastLogin: session.lastLogin
   };
 }
