@@ -1,15 +1,9 @@
 import { NextResponse } from 'next/server';
-import { upsertPortalUser } from '@/lib/supabase-admin';
 
-const allowedDomains = ['satgurutravel.com', 'satguruai.com'];
+import { getPortalUserByEmail, upsertPortalUser } from '@/lib/supabase-admin';
+import { createSessionToken, fallbackName, isAllowedEmail, normalizeEmail, sessionCookieOptions } from '@/lib/auth-flow';
 
-const cookieOptions = {
-  httpOnly: true,
-  sameSite: 'lax' as const,
-  secure: process.env.NODE_ENV === 'production',
-  maxAge: 24 * 60 * 60,
-  path: '/'
-};
+const primarySuperAdminEmail = 'admin@satguruai.com';
 
 type GoogleUserInfo = {
   email?: string;
@@ -22,12 +16,9 @@ function getBaseUrl(request: Request) {
   return new URL(request.url).origin;
 }
 
-function isAllowedEmail(email: string) {
-  return allowedDomains.some((domain) => email.toLowerCase().endsWith(`@${domain}`));
-}
-
-function safeCookieValue(value: string) {
-  return encodeURIComponent(value).slice(0, 3500);
+function normalizeRole(role: unknown, email: string) {
+  if (email === primarySuperAdminEmail) return 'super_admin' as const;
+  return role === 'super_admin' || role === 'admin' ? role : 'user';
 }
 
 export async function GET(request: Request) {
@@ -79,8 +70,8 @@ export async function GET(request: Request) {
     }
 
     const userInfo = (await userResponse.json()) as GoogleUserInfo;
-    const email = String(userInfo.email || '').toLowerCase();
-    const name = String(userInfo.name || email.split('@')[0] || 'Satguru User');
+    const email = normalizeEmail(userInfo.email);
+    const name = String(userInfo.name || fallbackName(email));
     const picture = String(userInfo.picture || '');
     const lastLogin = new Date().toISOString();
 
@@ -92,25 +83,36 @@ export async function GET(request: Request) {
       return NextResponse.redirect(new URL('/login?error=This Google email domain is not allowed.', baseUrl));
     }
 
+    const existingUser = await getPortalUserByEmail(email);
+    const role = normalizeRole(existingUser?.role, email);
+    const status = existingUser?.status === 'inactive' || existingUser?.status === 'disabled' ? 'inactive' : 'active';
+
+    if (status === 'inactive') {
+      return NextResponse.redirect(new URL('/login?error=Your account is inactive. Please contact administrator.', baseUrl));
+    }
+
     await upsertPortalUser({
       email,
       name,
       picture,
-      role: 'user',
+      role,
       status: 'active',
       login_method: 'google',
       last_login: lastLogin
     });
 
-    const response = NextResponse.redirect(new URL('/dashboard', baseUrl));
-    response.cookies.set('satguru_session', 'google', cookieOptions);
-    response.cookies.set('satguru_role', 'user', cookieOptions);
-    response.cookies.set('satguru_user_email', safeCookieValue(email), cookieOptions);
-    response.cookies.set('satguru_user_name', safeCookieValue(name), cookieOptions);
-    response.cookies.set('satguru_user_picture', safeCookieValue(picture), cookieOptions);
-    response.cookies.set('satguru_login_method', 'google', cookieOptions);
-    response.cookies.set('satguru_last_login', safeCookieValue(lastLogin), cookieOptions);
+    const sessionToken = createSessionToken({
+      email,
+      name,
+      picture,
+      role,
+      status: 'active',
+      loginMethod: 'google',
+      lastLogin
+    }, true);
 
+    const response = NextResponse.redirect(new URL('/dashboard', baseUrl));
+    response.cookies.set('satguru_session', sessionToken, sessionCookieOptions(true));
     return response;
   } catch {
     return NextResponse.redirect(new URL('/login?error=Unexpected Google login error.', baseUrl));
