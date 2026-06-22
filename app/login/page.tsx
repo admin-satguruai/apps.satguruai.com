@@ -92,29 +92,20 @@ export default function Login() {
 
       <section className="relative mx-auto flex min-h-[calc(100svh-1.5rem)] w-full max-w-5xl items-center justify-center">
         <div className="grid w-full overflow-hidden rounded-[1.45rem] border border-white/80 bg-white/92 shadow-2xl shadow-slate-900/12 backdrop-blur-xl lg:max-h-[calc(100svh-2rem)] lg:min-h-[500px] lg:grid-cols-[0.94fr_1.06fr]">
-          <aside className="hidden border-r border-slate-200/80 bg-white/45 p-4 lg:flex lg:flex-col lg:items-center lg:justify-center">
-            <div className="w-full max-w-md text-center">
-              <div className="relative mx-auto mb-4 h-36 w-full">
-                <div className="absolute inset-x-10 top-4 h-24 rounded-full border border-emerald-200/70 bg-white/50 shadow-inner" />
-                <div className="absolute left-16 top-7 h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(16,185,129,0.75)]" />
-                <div className="absolute right-16 top-20 h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(16,185,129,0.75)]" />
-                <div className="absolute left-1/2 top-6 h-28 w-28 -translate-x-1/2 rounded-full border border-emerald-100 bg-white/45" />
-                <div className="absolute inset-x-0 top-12 flex justify-center">
-                  <span className="rounded-2xl bg-white/82 px-5 py-2 shadow-sm shadow-slate-900/5 ring-1 ring-white/80">
-                    <SatguruLogo className="h-16 w-auto max-w-[330px] object-contain" />
-                  </span>
-                </div>
-              </div>
-              <h1 className="text-[clamp(1.35rem,1.85vw,1.85rem)] font-black leading-tight text-slate-950">Welcome back to Satguru AI</h1>
-              <p className="mt-2 text-sm text-slate-600">Secure access to your internal AI applications and tools.</p>
+          <aside className="hidden border-r border-slate-200/80 bg-gradient-to-br from-white/55 via-emerald-50/45 to-sky-50/35 p-8 lg:flex lg:flex-col lg:items-center lg:justify-center">
+            <div className="mx-auto flex w-full max-w-sm flex-col items-center text-center">
+              <SatguruLogo className="h-16 w-auto max-w-[300px] object-contain" />
+              <div className="mt-8 h-px w-28 bg-gradient-to-r from-transparent via-emerald-300 to-transparent" />
+              <h1 className="mt-8 text-[clamp(1.35rem,1.85vw,1.85rem)] font-black leading-tight text-slate-950">Welcome back to Satguru AI</h1>
+              <p className="mt-3 max-w-xs text-sm leading-6 text-slate-600">Secure access to your internal AI applications and tools.</p>
             </div>
           </aside>
 
-          <div className="flex min-h-0 items-center justify-center p-4 sm:p-5 lg:p-6">
-            <div className="w-full max-w-[480px]">
-              <div className="mb-4 text-center lg:hidden">
+          <div className="flex min-h-0 items-center justify-center p-5 sm:p-6 lg:p-8">
+            <div className="w-full max-w-[460px]">
+              <div className="mb-5 text-center lg:hidden">
                 <SatguruLogo className="mx-auto h-14 w-auto max-w-[220px] object-contain" />
-                <p className="mt-1 text-sm text-slate-600">Welcome back! Sign in to access your Satguru AI home.</p>
+                <p className="mt-2 text-sm text-slate-600">Welcome back! Sign in to access your Satguru AI home.</p>
               </div>
 
               <button className="flex w-full items-center justify-center gap-3 rounded-xl border border-emerald-100 bg-emerald-50/35 px-4 py-2 text-sm font-extrabold text-slate-900 shadow-sm hover:border-emerald-300 hover:bg-emerald-50" onClick={startGoogleLogin} type="button">
