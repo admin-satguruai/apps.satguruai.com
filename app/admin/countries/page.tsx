@@ -19,6 +19,32 @@ const columns: MasterColumn<CountryMasterRecord>[] = [
   { key: 'remarks', label: 'Remarks', defaultVisible: false }
 ];
 
+function CountryModuleHeader() {
+  const items = ['Administration', 'Master Data', 'Country', 'Country Module', 'Home'];
+
+  return (
+    <section className="space-y-4">
+      <nav className="flex flex-wrap items-center gap-2 text-sm font-black text-slate-400" aria-label="Country module breadcrumb">
+        {items.map((item, index) => (
+          <span className="flex items-center gap-2" key={item}>
+            <span className={index === items.length - 1 ? 'text-emerald-700' : ''}>{item}</span>
+            {index < items.length - 1 ? <span className="text-slate-300">&gt;</span> : null}
+          </span>
+        ))}
+      </nav>
+
+      <div className="flex flex-wrap gap-2 border-b border-slate-200">
+        <button className="rounded-t-2xl border border-b-0 border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-600 shadow-sm" type="button">
+          Country Dashboard
+        </button>
+        <button className="rounded-t-2xl border border-b-0 border-emerald-200 bg-emerald-50 px-5 py-3 text-sm font-black text-emerald-700 shadow-sm" type="button">
+          Country Home
+        </button>
+      </div>
+    </section>
+  );
+}
+
 function SidePanel({ countries }: { countries: CountryMasterRecord[] }) {
   const inactiveCountries = countries.filter((country) => country.status === 'Inactive');
   const missingPresence = countries.filter((country) => country.presenceStatus === 'No');
@@ -94,23 +120,28 @@ export default async function CountriesPage() {
 
   return (
     <AdminShell>
-      <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_340px]">
-        <MasterDataTable
-          title="Country Master"
-          description="Manage all countries used across Satguru AI for branches, reporting, access segmentation, dropdowns, and future enterprise master-data governance. Country remains an independent global reference master."
-          createLabel="+ Create Country"
-          searchPlaceholder="Search countries, ISO code, dialing code, continent, owner, or remarks..."
-          columns={columns}
-          rows={countries}
-          primaryKey="countryName"
-          searchKeys={['countryName', 'countryId', 'iso2', 'iso3', 'dialingCode', 'continent', 'subcontinent', 'owner', 'remarks']}
-          filters={[
-            { key: 'continent', label: 'Continent', options: continents.length ? continents : ['Asia', 'Africa', 'Europe'] },
-            { key: 'presenceStatus', label: 'Presence Status', options: ['Yes', 'No'] },
-            { key: 'status', label: 'Country Status', options: ['Active', 'Inactive'] }
-          ]}
-        />
-        <SidePanel countries={countries} />
+      <div className="space-y-5">
+        <CountryModuleHeader />
+        <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_340px]">
+          <div className="country-master-home">
+            <MasterDataTable
+              title="Country Master"
+              description="Manage all countries used across Satguru AI for branches, reporting, access segmentation, dropdowns, and future enterprise master-data governance. Country remains an independent global reference master."
+              createLabel="+ Create Country"
+              searchPlaceholder="Search countries, ISO code, dialing code, continent, owner, or remarks..."
+              columns={columns}
+              rows={countries}
+              primaryKey="countryName"
+              searchKeys={['countryName', 'countryId', 'iso2', 'iso3', 'dialingCode', 'continent', 'subcontinent', 'owner', 'remarks']}
+              filters={[
+                { key: 'continent', label: 'Continent', options: continents.length ? continents : ['Asia', 'Africa', 'Europe'] },
+                { key: 'presenceStatus', label: 'Presence Status', options: ['Yes', 'No'] },
+                { key: 'status', label: 'Country Status', options: ['Active', 'Inactive'] }
+              ]}
+            />
+          </div>
+          <SidePanel countries={countries} />
+        </div>
       </div>
     </AdminShell>
   );
