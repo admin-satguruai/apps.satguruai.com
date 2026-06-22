@@ -6,6 +6,7 @@ type PortalUserPayload = {
   status?: string;
   login_method?: string;
   last_login?: string;
+  password_hash?: string;
 };
 
 export type PortalUserRecord = {
@@ -17,6 +18,7 @@ export type PortalUserRecord = {
   status: string | null;
   login_method: string | null;
   last_login: string | null;
+  password_hash?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
 };
@@ -41,6 +43,10 @@ function getSupabaseHeaders(config: { serviceRoleKey: string }) {
 
 export function isSupabaseConfigured() {
   return Boolean(getSupabaseConfig());
+}
+
+function normalizeRole(role?: string | null) {
+  return role === 'admin' || role === 'super_admin' ? role : 'user';
 }
 
 export async function getPortalUserByEmail(email: string): Promise<PortalUserRecord | null> {
@@ -79,16 +85,20 @@ export async function upsertPortalUser(user: PortalUserPayload) {
   const now = new Date().toISOString();
   const cleanEmail = user.email.toLowerCase().trim();
   const existingUser = await getPortalUserByEmail(cleanEmail);
-  const payload = {
+  const payload: Record<string, unknown> = {
     email: cleanEmail,
     name: user.name,
     picture: user.picture ?? existingUser?.picture ?? null,
-    role: existingUser?.role ?? user.role ?? 'user',
+    role: normalizeRole(existingUser?.role ?? user.role),
     status: existingUser?.status ?? user.status ?? 'active',
     login_method: user.login_method ?? existingUser?.login_method ?? 'google',
     last_login: user.last_login ?? now,
     updated_at: now
   };
+
+  if (user.password_hash) {
+    payload.password_hash = user.password_hash;
+  }
 
   const response = await fetch(`${config.url}/rest/v1/portal_users?on_conflict=email`, {
     method: 'POST',
