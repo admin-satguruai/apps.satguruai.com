@@ -5,14 +5,19 @@ export const ALLOWED_DOMAINS = ['satgurutravel.com', 'satguruai.com'];
 export const TOKEN_TTL_MS = 10 * 60 * 1000;
 export const RESET_TTL_MS = 30 * 60 * 1000;
 export const SESSION_TTL_MS = 24 * 60 * 60 * 1000;
+export const REMEMBER_SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
-export const cookieOptions = {
-  httpOnly: true,
-  sameSite: 'lax' as const,
-  secure: process.env.NODE_ENV === 'production',
-  maxAge: 24 * 60 * 60,
-  path: '/'
-};
+export function sessionCookieOptions(rememberMe = false) {
+  return {
+    httpOnly: true,
+    sameSite: 'lax' as const,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60,
+    path: '/'
+  };
+}
+
+export const cookieOptions = sessionCookieOptions(false);
 
 export type SessionPayload = {
   email: string;
@@ -96,8 +101,8 @@ function normalizeRole(role: unknown): SessionPayload['role'] {
   return role === 'super_admin' || role === 'admin' ? role : 'user';
 }
 
-export function createSessionToken(payload: SessionPayload) {
-  return encodeToken({ purpose: 'session', ...payload, role: normalizeRole(payload.role) }, SESSION_TTL_MS);
+export function createSessionToken(payload: SessionPayload, rememberMe = false) {
+  return encodeToken({ purpose: 'session', ...payload, role: normalizeRole(payload.role), rememberMe }, rememberMe ? REMEMBER_SESSION_TTL_MS : SESSION_TTL_MS);
 }
 
 export function decodeSessionToken(token: string): SessionPayload | null {
