@@ -44,16 +44,7 @@ const navGroups: NavGroup[] = [
   {
     title: 'Administration',
     items: [
-      {
-        label: 'Master Data',
-        href: '/admin/countries',
-        icon: 'master',
-        children: [
-          { label: 'Country', href: '/admin/countries', icon: 'country' },
-          { label: 'Region', href: '/admin/regions', icon: 'region' },
-          { label: 'Branch', href: '/admin/branches', icon: 'branch' }
-        ]
-      },
+      { label: 'Country Master', href: '/admin/countries', icon: 'country' },
       { label: 'Reports', href: '/reports', icon: 'reports' },
       { label: 'Analytics', href: '/analytics', icon: 'analytics' }
     ]
