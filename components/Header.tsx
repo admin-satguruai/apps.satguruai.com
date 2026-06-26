@@ -31,6 +31,15 @@ function SearchIcon() {
   return <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path d="m21 21-4-4M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" strokeLinecap="round" /></svg>;
 }
 
+function LogoutIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <path d="M15.5 7.5V6a2 2 0 0 0-2-2h-6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 12h8m0 0-2.5-2.5M20 12l-2.5 2.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function Header({ user = null }: { user?: HeaderUser | null }) {
   const pathname = usePathname();
   const [profileOpen, setProfileOpen] = useState(false);
@@ -77,6 +86,11 @@ export function Header({ user = null }: { user?: HeaderUser | null }) {
                 <Link className="block rounded-xl px-4 py-3 text-sm font-bold text-slate-700 hover:bg-emerald-50" href="/profile">My Profile</Link>
                 <Link className="block rounded-xl px-4 py-3 text-sm font-bold text-slate-700 hover:bg-emerald-50" href="/admin/settings">Preferences</Link>
                 <Link className="block rounded-xl px-4 py-3 text-sm font-bold text-slate-700 hover:bg-emerald-50" href="/support">Help Center</Link>
+                <div className="my-2 border-t border-slate-100" />
+                <a className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-black text-red-600 transition hover:bg-red-50 hover:text-red-700" href="/api/auth/logout" aria-label="Logout from Satguru AI">
+                  <LogoutIcon />
+                  Logout
+                </a>
               </div>
             ) : null}
           </div>
