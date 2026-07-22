@@ -47,7 +47,7 @@ export function fallbackName(email: string) {
 }
 
 function cleanEnv(value: string | undefined) {
-  return String(value || '').trim().replace(/^['"]|['"]$/g, '');
+  return String(value || '').trim().replace(/^[']|[']$/g, '').replace(/^["]|["]$/g, '');
 }
 
 function cleanHost(value: string | undefined) {
@@ -63,10 +63,16 @@ function cleanHost(value: string | undefined) {
 
 function authSecret() {
   const configured = cleanEnv(process.env.AUTH_SECRET);
-  if (!configured && process.env.NODE_ENV === 'production') {
-    throw new Error('AUTH_SECRET is required in production.');
+  if (configured) return configured;
+
+  const googleClientSecretFallback = cleanEnv(process.env.GOOGLE_CLIENT_SECRET);
+  if (googleClientSecretFallback) return googleClientSecretFallback;
+
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('AUTH_SECRET is required in production. Add AUTH_SECRET in Vercel Environment Variables.');
   }
-  return configured || 'development-secret-change-before-production';
+
+  return 'development-secret-change-before-production';
 }
 
 export function sign(value: string) {
