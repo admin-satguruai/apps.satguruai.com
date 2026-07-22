@@ -12,8 +12,19 @@ type GoogleUserInfo = {
   email_verified?: boolean;
 };
 
+function cleanBaseUrl(url?: string) {
+  if (!url) return '';
+  const trimmed = url.trim().replace(/\/$/, '');
+  if (!trimmed) return '';
+  return trimmed.startsWith('http') ? trimmed : `https://${trimmed}`;
+}
+
 function getBaseUrl(request: Request) {
-  return new URL(request.url).origin;
+  return cleanBaseUrl(process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL) || new URL(request.url).origin;
+}
+
+function getRedirectUri(request: Request) {
+  return cleanBaseUrl(process.env.GOOGLE_REDIRECT_URI) || `${getBaseUrl(request)}/api/auth/google/callback`;
 }
 
 function normalizeRole(role: unknown, email: string) {
@@ -37,7 +48,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const redirectUri = `${baseUrl}/api/auth/google/callback`;
+    const redirectUri = getRedirectUri(request);
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
