@@ -11,6 +11,14 @@ type SessionPayload = {
   exp?: number;
 };
 
+function cleanEnv(value: string | undefined) {
+  return String(value || '').trim().replace(/^[']|[']$/g, '').replace(/^["]|["]$/g, '');
+}
+
+function getAuthSecret() {
+  return cleanEnv(process.env.AUTH_SECRET) || cleanEnv(process.env.GOOGLE_CLIENT_SECRET);
+}
+
 function isPublicPath(pathname: string) {
   return publicPaths.includes(pathname) || publicApiPrefixes.some((prefix) => pathname.startsWith(prefix));
 }
@@ -31,7 +39,7 @@ async function sign(body: string, secret: string) {
 
 async function readSession(request: NextRequest): Promise<SessionPayload | null> {
   const token = request.cookies.get('satguru_session')?.value || '';
-  const secret = process.env.AUTH_SECRET;
+  const secret = getAuthSecret();
   const [body, signature] = token.split('.');
 
   if (!secret || !body || !signature) return null;
