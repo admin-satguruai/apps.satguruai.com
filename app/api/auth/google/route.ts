@@ -2,8 +2,19 @@ import { NextResponse } from 'next/server';
 
 const googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
 
+function cleanBaseUrl(url?: string) {
+  if (!url) return '';
+  const trimmed = url.trim().replace(/\/$/, '');
+  if (!trimmed) return '';
+  return trimmed.startsWith('http') ? trimmed : `https://${trimmed}`;
+}
+
 function getBaseUrl(request: Request) {
-  return new URL(request.url).origin;
+  return cleanBaseUrl(process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL) || new URL(request.url).origin;
+}
+
+function getRedirectUri(request: Request) {
+  return cleanBaseUrl(process.env.GOOGLE_REDIRECT_URI) || `${getBaseUrl(request)}/api/auth/google/callback`;
 }
 
 export async function GET(request: Request) {
@@ -14,7 +25,7 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL('/login?error=Google login is not configured.', baseUrl));
   }
 
-  const redirectUri = `${baseUrl}/api/auth/google/callback`;
+  const redirectUri = getRedirectUri(request);
   const authUrl = new URL(googleAuthUrl);
   authUrl.searchParams.set('client_id', clientId);
   authUrl.searchParams.set('redirect_uri', redirectUri);
