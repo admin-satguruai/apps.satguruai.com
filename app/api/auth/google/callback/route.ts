@@ -19,8 +19,12 @@ function cleanBaseUrl(url?: string) {
   return trimmed.startsWith('http') ? trimmed : `https://${trimmed}`;
 }
 
+function getRequestOrigin(request: Request) {
+  return new URL(request.url).origin;
+}
+
 function getBaseUrl(request: Request) {
-  return cleanBaseUrl(process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL) || new URL(request.url).origin;
+  return cleanBaseUrl(process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL) || getRequestOrigin(request);
 }
 
 function getRedirectUri(request: Request) {
@@ -32,19 +36,36 @@ function normalizeRole(role: unknown, email: string) {
   return role === 'super_admin' || role === 'admin' ? role : 'user';
 }
 
+function loginRedirect(request: Request, message: string) {
+  return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(message)}`, getRequestOrigin(request)));
+}
+
+function safeGoogleError(error: unknown) {
+  const raw = error instanceof Error ? error.message : String(error || 'Unknown error');
+  return raw
+    .replace(/client_secret=[^&\s]+/gi, 'client_secret=[hidden]')
+    .replace(/access_token[^&\s]+/gi, 'access_token[hidden]')
+    .replace(/refresh_token[^&\s]+/gi, 'refresh_token[hidden]')
+    .slice(0, 180);
+}
+
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
-  const baseUrl = getBaseUrl(request);
   const code = requestUrl.searchParams.get('code');
+  const oauthError = requestUrl.searchParams.get('error');
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
+  if (oauthError) {
+    return loginRedirect(request, `Google login was cancelled or failed: ${oauthError}.`);
+  }
+
   if (!code) {
-    return NextResponse.redirect(new URL('/login?error=Google login was cancelled or failed.', baseUrl));
+    return loginRedirect(request, 'Google login was cancelled or failed.');
   }
 
   if (!clientId || !clientSecret) {
-    return NextResponse.redirect(new URL('/login?error=Google login is not configured.', baseUrl));
+    return loginRedirect(request, 'Google login is not configured.');
   }
 
   try {
@@ -62,14 +83,16 @@ export async function GET(request: Request) {
     });
 
     if (!tokenResponse.ok) {
-      return NextResponse.redirect(new URL('/login?error=Unable to complete Google login.', baseUrl));
+      const details = await tokenResponse.text().catch(() => 'No detail returned by Google.');
+      console.error('Google token exchange failed:', details);
+      return loginRedirect(request, 'Unable to complete Google login. Please check the Google redirect URI configured in Google Cloud and Vercel.');
     }
 
     const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token as string | undefined;
 
     if (!accessToken) {
-      return NextResponse.redirect(new URL('/login?error=Google did not return an access token.', baseUrl));
+      return loginRedirect(request, 'Google did not return an access token.');
     }
 
     const userResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
@@ -77,7 +100,9 @@ export async function GET(request: Request) {
     });
 
     if (!userResponse.ok) {
-      return NextResponse.redirect(new URL('/login?error=Unable to read Google profile.', baseUrl));
+      const details = await userResponse.text().catch(() => 'No detail returned by Google.');
+      console.error('Google profile read failed:', details);
+      return loginRedirect(request, 'Unable to read Google profile.');
     }
 
     const userInfo = (await userResponse.json()) as GoogleUserInfo;
@@ -87,11 +112,11 @@ export async function GET(request: Request) {
     const lastLogin = new Date().toISOString();
 
     if (!email || !userInfo.email_verified) {
-      return NextResponse.redirect(new URL('/login?error=Google email is not verified.', baseUrl));
+      return loginRedirect(request, 'Google email is not verified.');
     }
 
     if (!isAllowedEmail(email)) {
-      return NextResponse.redirect(new URL('/login?error=This Google email domain is not allowed.', baseUrl));
+      return loginRedirect(request, 'This Google email domain is not allowed.');
     }
 
     const existingUser = await getPortalUserByEmail(email);
@@ -99,10 +124,10 @@ export async function GET(request: Request) {
     const status = existingUser?.status === 'inactive' || existingUser?.status === 'disabled' ? 'inactive' : 'active';
 
     if (status === 'inactive') {
-      return NextResponse.redirect(new URL('/login?error=Your account is inactive. Please contact administrator.', baseUrl));
+      return loginRedirect(request, 'Your account is inactive. Please contact administrator.');
     }
 
-    await upsertPortalUser({
+    const saveResult = await upsertPortalUser({
       email,
       name,
       picture,
@@ -111,6 +136,10 @@ export async function GET(request: Request) {
       login_method: 'google',
       last_login: lastLogin
     });
+
+    if (!saveResult.saved) {
+      console.error('Google login continued without saving portal user:', saveResult.reason);
+    }
 
     const sessionToken = createSessionToken({
       email,
@@ -122,10 +151,12 @@ export async function GET(request: Request) {
       lastLogin
     }, true);
 
-    const response = NextResponse.redirect(new URL('/dashboard', baseUrl));
+    const response = NextResponse.redirect(new URL('/dashboard', getRequestOrigin(request)));
     response.cookies.set('satguru_session', sessionToken, sessionCookieOptions(true));
     return response;
-  } catch {
-    return NextResponse.redirect(new URL('/login?error=Unexpected Google login error.', baseUrl));
+  } catch (error) {
+    const detail = safeGoogleError(error);
+    console.error('Unexpected Google login callback failure:', detail);
+    return loginRedirect(request, `Google login failed during callback: ${detail}`);
   }
 }
