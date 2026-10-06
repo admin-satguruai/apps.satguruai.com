@@ -50,7 +50,16 @@ function firstBoolean(source: Record<string, unknown>, paths: string[][]) {
 function safeDetail(error: unknown) {
   return (error instanceof Error ? error.message : String(error || 'Unknown error'))
     .replace(/sai_token=[^&\s]+/gi, 'sai_token=[hidden]')
-    .slice(0, 180);
+    .slice(0, 240);
+}
+
+function safeVerifyBody(text: string) {
+  return String(text || '')
+    .replace(/sai_token["'=:\s]+[^,}\s]+/gi, 'sai_token=[hidden]')
+    .replace(/token["'=:\s]+[^,}\s]+/gi, 'token=[hidden]')
+    .replace(/secret["'=:\s]+[^,}\s]+/gi, 'secret=[hidden]')
+    .replace(/[\r\n]+/g, ' ')
+    .slice(0, 300);
 }
 
 async function verifyWithSai(saiToken: string) {
@@ -87,7 +96,12 @@ async function verifyWithSai(saiToken: string) {
   try {
     payload = text ? (JSON.parse(text) as VerifyResponse) : {};
   } catch {
-    throw new Error(`SAI verification returned an invalid response (HTTP ${response.status}).`);
+    const detail = safeVerifyBody(text);
+    console.error('SAI verification non-JSON response:', {
+      status: response.status,
+      body: detail || '[empty]'
+    });
+    throw new Error(`SAI verification returned an invalid response (HTTP ${response.status})${detail ? `: ${detail}` : ''}.`);
   }
 
   if (!response.ok || payload.ok === false || payload.valid === false) {
@@ -96,7 +110,15 @@ async function verifyWithSai(saiToken: string) {
       ['error'],
       ['detail']
     ]);
-    throw new Error(message || `SAI verification failed (HTTP ${response.status}).`);
+
+    const safeBody = safeVerifyBody(text);
+    console.error('SAI verification rejected:', {
+      status: response.status,
+      message: message || '[none]',
+      body: safeBody || '[empty]'
+    });
+
+    throw new Error(message || `SAI verification failed (HTTP ${response.status})${safeBody ? `: ${safeBody}` : ''}.`);
   }
 
   const returnedAudience = firstString(payload, [
